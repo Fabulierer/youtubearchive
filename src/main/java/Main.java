@@ -51,8 +51,9 @@ public class Main {
             }
 
             System.out.println();
-            label:
-            while (true) {
+
+            boolean quit = false;
+            while (!quit) {
                 Scanner scan = new Scanner(System.in);
                 System.out.print("YoutubeArchive> ");
                 String cmd = scan.nextLine();
@@ -92,7 +93,8 @@ public class Main {
                     case "quit":
                     case "q":
                         System.out.println("Quitting YoutubeArchive...");
-                        break label;
+                        quit = true;
+                        break;
                     default:
                         System.out.println("Unknown command! Use h for help!");
                         break;
