@@ -216,7 +216,7 @@ public class Main {
             for (int j = 0; j < length - rsmd.getColumnName(i).length(); j++) {
                 System.out.print(" ");
             }
-            System.out.print(" | ");
+            if (i != rsmd.getColumnCount()) System.out.print(" | ");
         }
         while (rs.next()) {
             System.out.println();
@@ -227,7 +227,7 @@ public class Main {
                 for (int j = 0; j < length - content.length(); j++) {
                     System.out.print(" ");
                 }
-                System.out.print(" | ");
+                if (i != rsmd.getColumnCount()) System.out.print(" | ");
             }
         }
         System.out.println();
