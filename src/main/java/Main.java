@@ -81,12 +81,36 @@ public class Main {
                     case "ua":
                         UpdateVideo.checkAll(con);
                         break;
+                    case "status":
+                    case "s":
+                        int length;
+                        if (args.length == 1) {
+                            length = 25;
+                        }
+                        else if (Integer.parseInt(args[1]) < 12) {
+                            length = 25;
+                            System.out.println("Length must be at least 12!");
+                        }
+                        else length = Integer.parseInt(args[1]);
+                        PreparedStatement ps = con.prepareStatement("SELECT SUBSTRING(VideoTitle, 1, (?)) AS Title," +
+                                "ChannelName AS Channel," +
+                                "LastChecked," +
+                                "(SELECT COUNT(y.VideoID) FROM archivedvideo y WHERE x.VideoID = y.VideoID) AS VideoChanged," +
+                                "(SELECT COUNT(y.VideoID) FROM archivedaudio y WHERE x.VideoID = y.VideoID) AS AudioChanged," +
+                                "(SELECT COUNT(y.VideoID) FROM archiveddescription y WHERE x.VideoID = y.VideoID) AS DescriptionChanged " +
+                                "FROM videolist x");
+                        ps.setInt(1, length);
+                        ResultSet rs = ps.executeQuery();
+                        printTable(rs, length);
+
+                        break;
                     case "help":
                     case "h":
                         System.out.println("Help:\n" +
                                 "addvideo/av (videoId) | adds a video to the list.\n" +
                                 "update/u (videoId) | manually update a video\n" +
                                 "updateall/ua | manually update every video\n" +
+                                "status/s | Shows the status of all videos\n" +
                                 "help/h | this\n" +
                                 "quit/q | obvious");
                         break;
@@ -177,11 +201,35 @@ public class Main {
                     + System.currentTimeMillis() +")");
             ps.setString(1, msg);
             ps.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException e) {
             System.out.println("Something went wrong while trying to save a message!");
             System.out.println("The message should have been: " + msg);
-            throwables.printStackTrace();
+            e.printStackTrace();
         }
+    }
+
+    private static void printTable(ResultSet rs, int length) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i < rsmd.getColumnCount(); i++) {
+            System.out.print(rsmd.getColumnName(i));
+            for (int j = 0; j < length - rsmd.getColumnName(i).length(); j++) {
+                System.out.print(" ");
+            }
+            System.out.print(" | ");
+        }
+        while (rs.next()) {
+            System.out.println();
+            for (int i = 1; i < rsmd.getColumnCount(); i++) {
+                String content = rs.getString(i);
+                if (content == null) content = "null"; // To prevent Nullpointer in line l. 215
+                System.out.print(content);
+                for (int j = 0; j < length - content.length(); j++) {
+                    System.out.print(" ");
+                }
+                System.out.print(" | ");
+            }
+        }
+        System.out.println();
     }
 
 }
