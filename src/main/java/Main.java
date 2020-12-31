@@ -1,5 +1,6 @@
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
+import javax.xml.transform.Result;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -74,7 +75,10 @@ public class Main {
                         if (args.length > 1) {
                             UpdateVideo.checkVideo(args[1], con);
                         } else {
-                            System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                            ResultSet rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
+                            while (rs.next()) {
+                                UpdateVideo.checkVideo(rs.getString(1), con);
+                            }
                         }
                         break;
                     case "updateall":
