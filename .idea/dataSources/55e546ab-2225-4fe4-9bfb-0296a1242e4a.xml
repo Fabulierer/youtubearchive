@@ -1073,7 +1073,10 @@
     </column>
     <column id="342" parent="335" name="Time">
       <Position>3</Position>
-      <DataType>bigint(20)|0s</DataType>
+      <DataType>timestamp|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>current_timestamp()</DefaultExpression>
+      <OnUpdate>current_timestamp()</OnUpdate>
     </column>
     <key id="343" parent="335" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
@@ -1092,7 +1095,10 @@
     </column>
     <column id="346" parent="336" name="Time">
       <Position>3</Position>
-      <DataType>bigint(20)|0s</DataType>
+      <DataType>timestamp|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>current_timestamp()</DefaultExpression>
+      <OnUpdate>current_timestamp()</OnUpdate>
     </column>
     <column id="347" parent="336" name="Description">
       <Position>4</Position>
@@ -1115,7 +1121,10 @@
     </column>
     <column id="351" parent="337" name="Time">
       <Position>3</Position>
-      <DataType>bigint(20)|0s</DataType>
+      <DataType>timestamp|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>current_timestamp()</DefaultExpression>
+      <OnUpdate>current_timestamp()</OnUpdate>
     </column>
     <key id="352" parent="337" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
@@ -1134,7 +1143,10 @@
     </column>
     <column id="355" parent="338" name="Time">
       <Position>3</Position>
-      <DataType>bigint(20)|0s</DataType>
+      <DataType>timestamp|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>current_timestamp()</DefaultExpression>
+      <OnUpdate>current_timestamp()</OnUpdate>
     </column>
     <key id="356" parent="338" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
@@ -1155,7 +1167,10 @@
     </column>
     <column id="360" parent="339" name="LastChecked">
       <Position>4</Position>
-      <DataType>bigint(20)|0s</DataType>
+      <DataType>timestamp|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>current_timestamp()</DefaultExpression>
+      <OnUpdate>current_timestamp()</OnUpdate>
     </column>
     <column id="361" parent="339" name="VideoItag">
       <Position>5</Position>

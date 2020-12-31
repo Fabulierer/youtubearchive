@@ -147,7 +147,7 @@ public class Main {
                             "VideoID varchar(255)," +
                             "VideoTitle varchar(255)," +
                             "ChannelName varchar(255)," +
-                            "LastChecked BIGINT," +
+                            "LastChecked TIMESTAMP," +
                             "VideoItag int," +
                             "AudioItag int)").execute();
                     break;
@@ -155,21 +155,21 @@ public class Main {
                     con.prepareStatement("CREATE TABLE ArchivedVideo(" +
                             "VideoVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
-                            "Time BIGINT," +
+                            "Time TIMESTAMP," +
                             "PRIMARY KEY (VideoVersionID))").execute();
                     break;
                 case "ArchivedAudio":
                     con.prepareStatement("CREATE TABLE ArchivedAudio(" +
                             "AudioVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
-                            "Time BIGINT," +
+                            "Time TIMESTAMP," +
                             "PRIMARY KEY (AudioVersionID))").execute();
                     break;
                 case "ArchivedDescription":
                     con.prepareStatement("CREATE TABLE ArchivedDescription(" +
                             "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
-                            "Time BIGINT," +
+                            "Time TIMESTAMP," +
                             "Description varchar(5000)," +
                             "PRIMARY KEY (DescriptionVersionID))").execute();
                     break;
@@ -177,7 +177,7 @@ public class Main {
                     con.prepareStatement("CREATE TABLE Messages(" +
                             "MessageId int NOT NULL AUTO_INCREMENT," +
                             "Message varchar(1023)," +
-                            "Time BIGINT," +
+                            "Time TIMESTAMP," +
                             "PRIMARY KEY (MessageId))").execute();
                     break;
                 default:
@@ -197,9 +197,10 @@ public class Main {
         try {
             PreparedStatement ps = con.prepareStatement("INSERT INTO messages " +
                     "VALUES(NULL," +
-                    "(?),"
-                    + System.currentTimeMillis() +")");
+                    "(?)," +
+                    "(?))");
             ps.setString(1, msg);
+            ps.setTime(2, new Time(System.currentTimeMillis()));
             ps.execute();
         } catch (SQLException e) {
             System.out.println("Something went wrong while trying to save a message!");
@@ -210,7 +211,7 @@ public class Main {
 
     private static void printTable(ResultSet rs, int length) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
-        for (int i = 1; i < rsmd.getColumnCount(); i++) {
+        for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
             System.out.print(rsmd.getColumnName(i));
             for (int j = 0; j < length - rsmd.getColumnName(i).length(); j++) {
                 System.out.print(" ");
@@ -219,7 +220,7 @@ public class Main {
         }
         while (rs.next()) {
             System.out.println();
-            for (int i = 1; i < rsmd.getColumnCount(); i++) {
+            for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
                 String content = rs.getString(i);
                 if (content == null) content = "null"; // To prevent Nullpointer in line l. 215
                 System.out.print(content);

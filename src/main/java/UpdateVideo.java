@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class UpdateVideo {
 
@@ -42,9 +39,9 @@ public class UpdateVideo {
             checkVideoFile(con, v);
             checkAudioFile(con, v);
             checkDescription(con, v);
-            PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = " + System.currentTimeMillis() +
-                    " WHERE VideoID = (?)");
-            ps.setString(1, v.details().videoId());
+            PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
+            ps.setTime(1, new Time(System.currentTimeMillis()));
+            ps.setString(2, v.details().videoId());
             ps.execute();
         } catch (YoutubeException e) {
             Main.sendMessage(con, "Video with VideoID " + videoId + " couldn't be found. Did it get deleted?");
@@ -83,8 +80,9 @@ public class UpdateVideo {
                 ps = con.prepareStatement("INSERT INTO archivedvideo VALUES(" +
                         "NULL," +
                         "(?)," +
-                        System.currentTimeMillis() + ")");
+                        "(?))");
                 ps.setString(1, v.details().videoId());
+                ps.setTime(2, new Time(System.currentTimeMillis()));
                 ps.execute();
                 ps = con.prepareStatement("SELECT VideoVersionID FROM archivedvideo " +
                         "WHERE VideoID = (?) ORDER BY Time DESC");
@@ -145,8 +143,9 @@ public class UpdateVideo {
                 ps = con.prepareStatement("INSERT INTO archivedaudio VALUES(" +
                         "NULL," +
                         "(?)," +
-                        System.currentTimeMillis() + ")");
+                        "(?))");
                 ps.setString(1, v.details().videoId());
+                ps.setTime(2, new Time(System.currentTimeMillis()));
                 ps.execute();
                 ps = con.prepareStatement("SELECT AudioVersionID FROM archivedaudio " +
                         "WHERE VideoID = (?) ORDER BY Time DESC");
@@ -196,10 +195,11 @@ public class UpdateVideo {
                 ps = con.prepareStatement("INSERT INTO archiveddescription VALUES(" +
                         "NULL," +
                         "?," +
-                        System.currentTimeMillis() + "," +
+                        "(?)," +
                         "(?))");
                 ps.setString(1, v.details().videoId());
-                ps.setString(2, v.details().description());
+                ps.setTime(2, new Time(System.currentTimeMillis()));
+                ps.setString(3, v.details().description());
                 ps.execute();
                 rs = con.prepareStatement("SELECT Description FROM archiveddescription " +
                         "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
