@@ -2,9 +2,9 @@ import com.github.kiulian.downloader.YoutubeDownloader;
 import com.github.kiulian.downloader.YoutubeException;
 import com.github.kiulian.downloader.model.VideoDetails;
 import com.github.kiulian.downloader.model.YoutubeVideo;
-import com.github.kiulian.downloader.model.formats.Format;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class AddVideo {
@@ -16,14 +16,20 @@ public class AddVideo {
                 YoutubeVideo v = downloader.getVideo(id);
                 VideoDetails details = v.details();
                 System.out.println("Adding the video: " + details.title());
-                Integer[] formate = BestFormat.getFormats(v);
-                con.prepareStatement("INSERT INTO VideoList " +
-                        "VALUES('" + id + "'," +
-                        "'" + details.title() + "'," +
-                        "'" + details.author() + "'," +
+                Integer[] formats = BestFormat.getFormats(v);
+                PreparedStatement ps = con.prepareStatement("INSERT INTO VideoList " +
+                        "VALUES((?)," +
+                        "(?)," +
+                        "(?)," +
                         "NULL," +
-                        "'" + formate[0] + "'," +
-                        "'" + formate[1] + "')").execute();
+                        "(?)," +
+                        "(?))");
+                ps.setString(1, id);
+                ps.setString(2, details.title());
+                ps.setString(3, details.author());
+                ps.setInt(4, formats[0]);
+                ps.setInt(5, formats[1]);
+                ps.execute();
                 if (con.prepareStatement("SELECT VideoID FROM VideoList WHERE VideoID = '" + id + "'").executeQuery().next()){
                     System.out.println("Successfully added the video!");
                 } else {
@@ -32,13 +38,8 @@ public class AddVideo {
             } else {
                 System.out.println("Video already exists in Database!");
             }
-        } catch (YoutubeException e) {
-            System.out.println(id);
+        } catch (YoutubeException | SQLException | VideoCodecNotFoundException e) {
             e.printStackTrace();
-        } catch (VideoCodecNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
 
     }

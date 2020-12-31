@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -28,8 +29,8 @@ public class UpdateVideo {
                 System.out.println("Checking Video " + rs.getRow() + "/" + elements);
                 checkVideo(rs.getString(1), con);
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -41,10 +42,12 @@ public class UpdateVideo {
             checkVideoFile(con, v);
             checkAudioFile(con, v);
             checkDescription(con, v);
-            con.prepareStatement("UPDATE videolist SET lastchecked = " + System.currentTimeMillis() +
-                    " WHERE VideoID = '" + videoId + "'");
+            PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = " + System.currentTimeMillis() +
+                    " WHERE VideoID = (?)");
+            ps.setString(1, v.details().videoId());
+            ps.execute();
         } catch (YoutubeException e) {
-            Main.sendMessage(con, "Video with VideoID " + videoId + " couldnt be found. Did it get deleted?");
+            Main.sendMessage(con, "Video with VideoID " + videoId + " couldn't be found. Did it get deleted?");
         } catch (VideoNotInDatabaseException | SQLException e) {
             e.printStackTrace();
         }
@@ -52,12 +55,16 @@ public class UpdateVideo {
 
     private static void checkVideoFile(Connection con, YoutubeVideo v) throws VideoNotInDatabaseException {
         try {
-            ResultSet rs = con.prepareStatement("SELECT VideoItag FROM videolist " +
-                    "WHERE VideoID = '" + v.details().videoId() + "'").executeQuery();
+            PreparedStatement ps = con.prepareStatement("SELECT VideoItag FROM videolist " +
+                    "WHERE VideoID = (?)");
+            ps.setString(1, v.details().videoId());
+            ResultSet rs = ps.executeQuery();
             int itag = downloadFile(v, rs);
-            rs = con.prepareStatement("SELECT VideoVersionID FROM archivedvideo " +
-                    "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
-            boolean videoChanged = false;
+            ps = con.prepareStatement("SELECT VideoVersionID FROM archivedvideo " +
+                    "WHERE VideoID = (?) ORDER BY Time DESC");
+            ps.setString(1, v.details().videoId());
+            rs = ps.executeQuery();
+            boolean videoChanged;
             String versionId = "";
             File downloadedFile = new File("./temp." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
             if (rs.next()) {
@@ -73,12 +80,17 @@ public class UpdateVideo {
             }
             if (videoChanged) {
                 System.out.println("Video change detected! Archiving video...");
-                con.prepareStatement("INSERT INTO archivedvideo VALUES(" +
+                ps = con.prepareStatement("INSERT INTO archivedvideo VALUES(" +
                         "NULL," +
-                        "'" + v.details().videoId() + "'," +
-                        System.currentTimeMillis() + ")").execute();
-                rs = con.prepareStatement("SELECT VideoVersionID FROM archivedvideo " +
-                        "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
+                        "(?)," +
+                        System.currentTimeMillis() + ")");
+                ps.setString(1, v.details().videoId());
+                ps.execute();
+                ps = con.prepareStatement("SELECT VideoVersionID FROM archivedvideo " +
+                        "WHERE VideoID = (?) ORDER BY Time DESC");
+                ps.setString(1, v.details().videoId());
+                rs = ps.executeQuery();
+
                 rs.next();
                 String newVersionId = rs.getString(1);
                 if (versionId.equals(newVersionId)) {
@@ -94,8 +106,6 @@ public class UpdateVideo {
             } else {
                 System.out.println("There were no video changes detected!");
             }
-
-
         } catch (SQLException |
                 VideoCodecNotFoundException |
                 FileDownloadFailedException |
@@ -107,12 +117,16 @@ public class UpdateVideo {
 
     private static void checkAudioFile(Connection con, YoutubeVideo v) throws VideoNotInDatabaseException {
         try {
-            ResultSet rs = con.prepareStatement("SELECT AudioItag FROM videolist " +
-                    "WHERE VideoID = '" + v.details().videoId() + "'").executeQuery();
+            PreparedStatement ps = con.prepareStatement("SELECT AudioItag FROM videolist " +
+                    "WHERE VideoID = (?)");
+            ps.setString(1, v.details().videoId());
+            ResultSet rs = ps.executeQuery();
             int itag = downloadFile(v, rs);
-            rs = con.prepareStatement("SELECT AudioVersionID FROM archivedaudio " +
-                    "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
-            boolean audioChanged = false;
+            ps = con.prepareStatement("SELECT AudioVersionID FROM archivedaudio " +
+                    "WHERE VideoID = (?) ORDER BY Time DESC");
+            ps.setString(1, v.details().videoId());
+            rs = ps.executeQuery();
+            boolean audioChanged;
             String versionId = "";
             File downloadedFile = new File("./temp." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
             if (rs.next()) {
@@ -128,12 +142,16 @@ public class UpdateVideo {
             }
             if (audioChanged) {
                 System.out.println("Audio change detected! Archiving audio...");
-                con.prepareStatement("INSERT INTO archivedaudio VALUES(" +
+                ps = con.prepareStatement("INSERT INTO archivedaudio VALUES(" +
                         "NULL," +
-                        "'" + v.details().videoId() + "'," +
-                        System.currentTimeMillis() + ")").execute();
-                rs = con.prepareStatement("SELECT AudioVersionID FROM archivedaudio " +
-                        "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
+                        "(?)," +
+                        System.currentTimeMillis() + ")");
+                ps.setString(1, v.details().videoId());
+                ps.execute();
+                ps = con.prepareStatement("SELECT AudioVersionID FROM archivedaudio " +
+                        "WHERE VideoID = (?) ORDER BY Time DESC");
+                ps.setString(1, v.details().videoId());
+                rs = ps.executeQuery();
                 rs.next();
                 String newVersionId = rs.getString(1);
                 if (versionId.equals(newVersionId)) {
@@ -160,9 +178,12 @@ public class UpdateVideo {
 
     private static void checkDescription(Connection con, YoutubeVideo v) {
         try {
-            ResultSet rs = con.prepareStatement("SELECT Description FROM archiveddescription " +
-                    "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
-            boolean descriptionChanged = false;
+            PreparedStatement ps = con.prepareStatement("SELECT Description FROM archiveddescription " +
+                    "WHERE VideoID = (?) ORDER BY Time DESC");
+            ps.setString(1, v.details().videoId());
+            ResultSet rs = ps.executeQuery();
+
+            boolean descriptionChanged;
             String oldDescription = ".";
             if (rs.next()) {
                 oldDescription = rs.getString(1);
@@ -172,11 +193,14 @@ public class UpdateVideo {
             }
             if (descriptionChanged) {
                 System.out.println("Description change detected! Archiving description...");
-                con.prepareStatement("INSERT INTO archiveddescription VALUES(" +
+                ps = con.prepareStatement("INSERT INTO archiveddescription VALUES(" +
                         "NULL," +
-                        "'" + v.details().videoId() + "'," +
+                        "?," +
                         System.currentTimeMillis() + "," +
-                        "'" + v.details().description() + "')").execute();
+                        "(?))");
+                ps.setString(1, v.details().videoId());
+                ps.setString(2, v.details().description());
+                ps.execute();
                 rs = con.prepareStatement("SELECT Description FROM archiveddescription " +
                         "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
                 rs.next();

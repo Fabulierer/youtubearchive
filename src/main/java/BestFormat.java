@@ -74,6 +74,8 @@ public class BestFormat {
             }
         }
 
+        assert bestVideo != null;
+        assert bestAudio != null;
         return new Integer[]{bestVideo.itag().id(), bestAudio.itag().id()};
     }
 

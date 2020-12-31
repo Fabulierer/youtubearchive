@@ -1,4 +1,3 @@
-import com.github.kiulian.downloader.YoutubeException;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
 import java.io.File;
@@ -51,7 +50,8 @@ public class Main {
                 System.out.println("Directory 'storage' already exists.");
             }
 
-            System.out.println("");
+            System.out.println();
+            label:
             while (true) {
                 Scanner scan = new Scanner(System.in);
                 System.out.print("YoutubeArchive> ");
@@ -59,40 +59,43 @@ public class Main {
                 String[] args = cmd.split(" ");
                 args[0] = args[0].toLowerCase();
 
-                if (args[0].equals("addvideo") || args[0].equals("av")) {
-                    if (args.length > 1) {
-                        AddVideo.addVideo(args[1], con);
-                    } else {
-                        System.out.println("You need to use at least 1 Parameter! Use h for more information!");
-                    }
-                }
-
-                else if (args[0].equals("update") || args[0].equals("u")) {
-                    if (args.length > 1) {
-                        UpdateVideo.checkVideo(args[1], con);
-                    } else {
-                        System.out.println("You need to use at least 1 Parameter! Use h for more information!");
-                    }
-                }
-
-                else if (args[0].equals("updateall") || args[0].equals("ua")) {
-                    UpdateVideo.checkAll(con);
-                }
-
-                else if (args[0].equals("help") || args[0].equals("h")) {
-                    System.out.println("Help:\n" +
-                            "addvideo/av (videoId) | adds a video to the list.\n" +
-                            "update/u (videoId) | manually update a video\n" +
-                            "updateall/ua | manually update every video\n" +
-                            "help/h | this\n" +
-                            "quit/q | obvious");
-                }
-
-                else if (args[0].equals("quit") || args[0].equals("q")) {
-                    System.out.println("Quitting YoutubeArchive...");
-                    break;
-                } else {
-                    System.out.println("Unknown command! Use h for help!");
+                switch (args[0]) {
+                    case "addvideo":
+                    case "av":
+                        if (args.length > 1) {
+                            AddVideo.addVideo(args[1], con);
+                        } else {
+                            System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                        }
+                        break;
+                    case "update":
+                    case "u":
+                        if (args.length > 1) {
+                            UpdateVideo.checkVideo(args[1], con);
+                        } else {
+                            System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                        }
+                        break;
+                    case "updateall":
+                    case "ua":
+                        UpdateVideo.checkAll(con);
+                        break;
+                    case "help":
+                    case "h":
+                        System.out.println("Help:\n" +
+                                "addvideo/av (videoId) | adds a video to the list.\n" +
+                                "update/u (videoId) | manually update a video\n" +
+                                "updateall/ua | manually update every video\n" +
+                                "help/h | this\n" +
+                                "quit/q | obvious");
+                        break;
+                    case "quit":
+                    case "q":
+                        System.out.println("Quitting YoutubeArchive...");
+                        break label;
+                    default:
+                        System.out.println("Unknown command! Use h for help!");
+                        break;
                 }
             }
         } catch (IndexOutOfBoundsException e) {
@@ -112,40 +115,48 @@ public class Main {
             System.out.println("Found the " + tableName + " Table.");
         } catch (MySQLSyntaxErrorException e) {
             System.out.println("Couldn't find table '" + tableName + "'. Creating a new one...");
-            if (tableName.equals("VideoList")) {
-                con.prepareStatement("CREATE TABLE VideoList(" +
-                        "VideoID varchar(255)," +
-                        "VideoTitle varchar(255)," +
-                        "ChannelLink varchar(255)," +
-                        "LastChecked BIGINT," +
-                        "VideoItag int," +
-                        "AudioItag int)").execute();
-            } else if (tableName.equals("ArchivedVideo")) {
-                con.prepareStatement("CREATE TABLE ArchivedVideo(" +
-                        "VideoVersionID int NOT NULL AUTO_INCREMENT," +
-                        "VideoID varchar(255)," +
-                        "Time BIGINT," +
-                        "PRIMARY KEY (VideoVersionID))").execute();
-            } else if (tableName.equals("ArchivedAudio")) {
-                con.prepareStatement("CREATE TABLE ArchivedAudio(" +
-                        "AudioVersionID int NOT NULL AUTO_INCREMENT," +
-                        "VideoID varchar(255)," +
-                        "Time BIGINT," +
-                        "PRIMARY KEY (AudioVersionID))").execute();
-            } else if (tableName.equals("ArchivedDescription")) {
-                con.prepareStatement("CREATE TABLE ArchivedDescription(" +
-                        "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
-                        "VideoID varchar(255)," +
-                        "Time BIGINT," +
-                        "Description varchar(5000)," +
-                        "PRIMARY KEY (DescriptionVersionID))").execute();
-            } else if (tableName.equals("Messages")) {
-                con.prepareStatement("CREATE TABLE Messages(" +
-                        "MessageId int NOT NULL AUTO_INCREMENT," +
-                        "Message varchar(1023)," +
-                        "Time BIGINT," +
-                        "PRIMARY KEY (MessageId))").execute();
-            } else throw new TableCreationFailedException();
+            switch (tableName) {
+                case "VideoList":
+                    con.prepareStatement("CREATE TABLE VideoList(" +
+                            "VideoID varchar(255)," +
+                            "VideoTitle varchar(255)," +
+                            "ChannelName varchar(255)," +
+                            "LastChecked BIGINT," +
+                            "VideoItag int," +
+                            "AudioItag int)").execute();
+                    break;
+                case "ArchivedVideo":
+                    con.prepareStatement("CREATE TABLE ArchivedVideo(" +
+                            "VideoVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time BIGINT," +
+                            "PRIMARY KEY (VideoVersionID))").execute();
+                    break;
+                case "ArchivedAudio":
+                    con.prepareStatement("CREATE TABLE ArchivedAudio(" +
+                            "AudioVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time BIGINT," +
+                            "PRIMARY KEY (AudioVersionID))").execute();
+                    break;
+                case "ArchivedDescription":
+                    con.prepareStatement("CREATE TABLE ArchivedDescription(" +
+                            "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time BIGINT," +
+                            "Description varchar(5000)," +
+                            "PRIMARY KEY (DescriptionVersionID))").execute();
+                    break;
+                case "Messages":
+                    con.prepareStatement("CREATE TABLE Messages(" +
+                            "MessageId int NOT NULL AUTO_INCREMENT," +
+                            "Message varchar(1023)," +
+                            "Time BIGINT," +
+                            "PRIMARY KEY (MessageId))").execute();
+                    break;
+                default:
+                    throw new TableCreationFailedException();
+            }
             try {
                 con.prepareStatement("SELECT * FROM " + tableName).executeQuery();
                 System.out.println("Successfully created the new Table!");
@@ -158,10 +169,12 @@ public class Main {
 
     public static void sendMessage(Connection con, String msg) {
         try {
-            con.prepareStatement("INSERT INTO messages " +
+            PreparedStatement ps = con.prepareStatement("INSERT INTO messages " +
                     "VALUES(NULL," +
-                    "'" + msg +"',"
-                    + System.currentTimeMillis() +")").execute();
+                    "(?),"
+                    + System.currentTimeMillis() +")");
+            ps.setString(1, msg);
+            ps.execute();
         } catch (SQLException throwables) {
             System.out.println("Something went wrong while trying to save a message!");
             System.out.println("The message should have been: " + msg);
