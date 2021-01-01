@@ -61,7 +61,6 @@ public class UpdateVideo {
             checkDescription(con, v);
             checkThumbnail(con, v);
             checkTitle(con, v);
-            v.details().thumbnails().forEach(image -> System.out.println("Thumbnail: " + image));
             PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
             ps.setTime(1, new Time(System.currentTimeMillis()));
             ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));

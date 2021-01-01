@@ -1,3 +1,4 @@
+import com.github.kiulian.downloader.YoutubeException;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import org.apache.commons.io.FileUtils;
 
@@ -83,6 +84,14 @@ public class Main {
                             System.out.println("You need to use at least 1 Parameter! Use h for more information!");
                         }
                         break;
+                    case "addplaylist":
+                    case "ap":
+                        if (args.length > 1) {
+                            AddVideo.addPlaylist(args[1], con);
+                        } else {
+                            System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                        }
+                        break;
                     case "update":
                     case "u":
                         if (args.length > 1) {
@@ -102,7 +111,6 @@ public class Main {
                         } else {
                             UpdateVideo.scheduleUpdate(con, 24);
                         }
-
                         break;
                     case "status":
                     case "s":
@@ -170,7 +178,7 @@ public class Main {
                 }
             }
             if (UpdateVideo.t != null) UpdateVideo.t.cancel();
-        } catch (IndexOutOfBoundsException | TableCreationFailedException e) {
+        } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();

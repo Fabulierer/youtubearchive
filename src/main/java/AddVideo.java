@@ -2,12 +2,22 @@ import com.github.kiulian.downloader.YoutubeDownloader;
 import com.github.kiulian.downloader.YoutubeException;
 import com.github.kiulian.downloader.model.VideoDetails;
 import com.github.kiulian.downloader.model.YoutubeVideo;
+import com.github.kiulian.downloader.model.playlist.PlaylistVideoDetails;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class AddVideo {
+
+    public static void addPlaylist(String id, Connection con) throws YoutubeException {
+        YoutubeDownloader downloader = new YoutubeDownloader();
+        List<PlaylistVideoDetails> pl = downloader.getPlaylist(id).videos();
+        for (PlaylistVideoDetails playlistVideoDetails : pl) {
+            addVideo(playlistVideoDetails.videoId(), con);
+        }
+    }
 
     public static void addVideo(String id, Connection con) {
         try {
