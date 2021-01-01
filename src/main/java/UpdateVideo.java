@@ -60,6 +60,7 @@ public class UpdateVideo {
             checkAudioFile(con, v);
             checkDescription(con, v);
             checkThumbnail(con, v);
+            checkTitle(con, v);
             v.details().thumbnails().forEach(image -> System.out.println("Thumbnail: " + image));
             PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
             ps.setTime(1, new Time(System.currentTimeMillis()));
@@ -318,6 +319,66 @@ public class UpdateVideo {
                 }
             } else {
                 System.out.println("There were no thumbnail changes detected!");
+            }
+        } catch (SQLException |
+                FileDownloadFailedException |
+                IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void checkTitle(Connection con, YoutubeVideo v) {
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT TitleVersionID FROM archivedtitle " +
+                    "WHERE VideoID = (?) ORDER BY Time DESC");
+            ps.setString(1, v.details().videoId());
+            ResultSet rs = ps.executeQuery();
+            boolean titleChanged;
+            String versionId = "";
+            File downloadedFile = new File("./temp.txt");
+            FileUtils.writeStringToFile(downloadedFile, v.details().title(), "UTF-8");
+            if (rs.next()) {
+                versionId = rs.getString(1);
+                File newestBackup = new File("./storage/" + v.details().videoId() + "/title/"
+                        + versionId + ".txt");
+                titleChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
+            } else {
+                System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/title/");
+                Path storage = Paths.get("./storage/" + v.details().videoId() + "/title/");
+                Files.createDirectories(storage);
+                titleChanged = true;
+            }
+            if (titleChanged) {
+                System.out.println("Title change detected! Archiving title...");
+                ps = con.prepareStatement("INSERT INTO archivedtitle VALUES(" +
+                        "NULL," +
+                        "(?)," +
+                        "(?))");
+                ps.setString(1, v.details().videoId());
+                ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                ps.execute();
+                ps = con.prepareStatement("SELECT TitleVersionID FROM archivedtitle " +
+                        "WHERE VideoID = (?) ORDER BY Time DESC");
+                ps.setString(1, v.details().videoId());
+                rs = ps.executeQuery();
+                rs.next();
+                String newVersionId = rs.getString(1);
+                if (versionId.equals(newVersionId)) {
+                    throw new FileDownloadFailedException();
+                }
+                File copyTarget = new File("./storage/" + v.details().videoId() + "/title/" +
+                        newVersionId + ".txt");
+                if (!downloadedFile.renameTo(copyTarget)) {
+                    throw new FileDownloadFailedException();
+                }
+                System.out.println("Successfully archived the title!");
+                if (v.details().title().length() >= 20) {
+                    Main.sendMessage(con, "Title of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                } else {
+                    Main.sendMessage(con, "Title of video \"" + v.details().title() + "\" changed!");
+                }
+            } else {
+                System.out.println("There were no title changes detected!");
             }
         } catch (SQLException |
                 FileDownloadFailedException |

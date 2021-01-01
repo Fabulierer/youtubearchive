@@ -41,6 +41,7 @@ public class Main {
             checkTable("ArchivedAudio", con);
             checkTable("ArchivedDescription", con);
             checkTable("ArchivedThumbnail", con);
+            checkTable("ArchivedTitle", con);
             checkTable("Messages", con);
 
             System.out.println("Checking if 'storage' directory exists...");
@@ -199,6 +200,13 @@ public class Main {
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (AudioVersionID))").execute();
                     break;
+                case "ArchivedDescription":
+                    con.prepareStatement("CREATE TABLE ArchivedDescription(" +
+                            "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time TIMESTAMP," +
+                            "PRIMARY KEY (DescriptionVersionID))").execute();
+                    break;
                 case "ArchivedThumbnail":
                     con.prepareStatement("CREATE TABLE ArchivedThumbnail(" +
                             "ThumbnailVersionID int NOT NULL AUTO_INCREMENT," +
@@ -206,12 +214,12 @@ public class Main {
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (ThumbnailVersionID))").execute();
                     break;
-                case "ArchivedDescription":
-                    con.prepareStatement("CREATE TABLE ArchivedDescription(" +
-                            "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
+                case "ArchivedTitle":
+                    con.prepareStatement("CREATE TABLE ArchivedTitle(" +
+                            "TitleVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
-                            "PRIMARY KEY (DescriptionVersionID))").execute();
+                            "PRIMARY KEY (TitleVersionID))").execute();
                     break;
                 case "Messages":
                     con.prepareStatement("CREATE TABLE Messages(" +
