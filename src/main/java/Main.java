@@ -108,8 +108,13 @@ public class Main {
                         break;
                     case "messages":
                     case "m":
-                        con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
                         printTableMax(con.prepareStatement("SELECT * FROM messages").executeQuery());
+                        con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
+                        break;
+                    case "cleanmessages":
+                    case "cm":
+                        con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
+                        System.out.println("Unread Messages have been removed!");
                         break;
                     case "wipe":
                     case "w":
@@ -254,7 +259,7 @@ public class Main {
         }
         System.out.println();
     }
-    
+
     private static void printTableMax(ResultSet rs) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         int[] length = new int[rsmd.getColumnCount()];
