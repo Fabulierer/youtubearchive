@@ -1,4 +1,5 @@
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -54,6 +55,8 @@ public class Main {
 
             boolean quit = false;
             while (!quit) {
+                checkUnreadMessages(con);
+
                 Scanner scan = new Scanner(System.in);
                 System.out.print("YoutubeArchive> ");
                 String cmd = scan.nextLine();
@@ -102,7 +105,24 @@ public class Main {
                         ps.setInt(1, length);
                         ResultSet rs = ps.executeQuery();
                         printTable(rs, length);
-
+                        break;
+                    case "messages":
+                    case "m":
+                        con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
+                        printTableMax(con.prepareStatement("SELECT * FROM messages").executeQuery());
+                        break;
+                    case "wipe":
+                    case "w":
+                        if (new File("wipe").exists()) {
+                            con.prepareStatement("DROP TABLE archivedaudio, archiveddescription, archivedvideo, messages, videolist").execute();
+                            System.out.println("Database has been wiped!");
+                            FileUtils.deleteDirectory(new File("storage"));
+                            System.out.println("Storage has been wiped!");
+                            System.out.println("Quitting YoutubeArchive...");
+                            quit = true;
+                        } else {
+                            System.out.println("In order to complete a wipe, you must create a file called wipe.");
+                        }
                         break;
                     case "help":
                     case "h":
@@ -176,7 +196,8 @@ public class Main {
                 case "Messages":
                     con.prepareStatement("CREATE TABLE Messages(" +
                             "MessageId int NOT NULL AUTO_INCREMENT," +
-                            "Message varchar(1023)," +
+                            "Message varchar(511)," +
+                            "MessageRead BOOLEAN," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (MessageId))").execute();
                     break;
@@ -198,9 +219,10 @@ public class Main {
             PreparedStatement ps = con.prepareStatement("INSERT INTO messages " +
                     "VALUES(NULL," +
                     "(?)," +
+                    "0," +
                     "(?))");
             ps.setString(1, msg);
-            ps.setTime(2, new Time(System.currentTimeMillis()));
+            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             ps.execute();
         } catch (SQLException e) {
             System.out.println("Something went wrong while trying to save a message!");
@@ -222,7 +244,7 @@ public class Main {
             System.out.println();
             for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
                 String content = rs.getString(i);
-                if (content == null) content = "null"; // To prevent Nullpointer in line l. 215
+                if (content == null) content = "null"; // To prevent Nullpointer in "content.length()"
                 System.out.print(content);
                 for (int j = 0; j < length - content.length(); j++) {
                     System.out.print(" ");
@@ -231,6 +253,53 @@ public class Main {
             }
         }
         System.out.println();
+    }
+    
+    private static void printTableMax(ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int[] length = new int[rsmd.getColumnCount()];
+
+        for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
+            if (length[i - 1] < rsmd.getColumnName(i).length()) {
+                length[i - 1] = rsmd.getColumnName(i).length();
+            }
+        }
+        while (rs.next()) {
+            System.out.println();
+            for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
+                if (length[i - 1] < rs.getString(i).length()) {
+                    length[i - 1] = rs.getString(i).length();
+                }
+            }
+        }
+        for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
+            System.out.print(rsmd.getColumnName(i));
+            for (int j = 0; j < length[i - 1] - rsmd.getColumnName(i).length(); j++) {
+                System.out.print(" ");
+            }
+            if (i != rsmd.getColumnCount()) System.out.print(" | ");
+        }
+        rs.beforeFirst();
+        while (rs.next()) {
+            System.out.println();
+            for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
+                String content = rs.getString(i);
+                if (content == null) content = "null"; // To prevent Nullpointer in "content.length()"
+                System.out.print(content);
+                for (int j = 0; j < length[i - 1] - content.length(); j++) {
+                    System.out.print(" ");
+                }
+                if (i != rsmd.getColumnCount()) System.out.print(" | ");
+            }
+        }
+        System.out.println();
+    }
+
+    private static void checkUnreadMessages(Connection con) throws SQLException {
+        ResultSet rs = con.prepareStatement("SELECT * FROM messages WHERE MessageRead = 0").executeQuery();
+        int unreadMessages = 0;
+        while (rs.next()) unreadMessages++;
+        if (unreadMessages != 0) System.out.println("You have " + unreadMessages + " unread messages!");
     }
 
 }

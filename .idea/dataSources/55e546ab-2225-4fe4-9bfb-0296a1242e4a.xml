@@ -1139,44 +1139,48 @@
     </column>
     <column id="354" parent="338" name="Message">
       <Position>2</Position>
-      <DataType>varchar(1023)|0s</DataType>
+      <DataType>varchar(511)|0s</DataType>
     </column>
-    <column id="355" parent="338" name="Time">
+    <column id="355" parent="338" name="MessageRead">
       <Position>3</Position>
-      <DataType>timestamp|0s</DataType>
-      <NotNull>1</NotNull>
-      <DefaultExpression>current_timestamp()</DefaultExpression>
-      <OnUpdate>current_timestamp()</OnUpdate>
+      <DataType>tinyint(1)|0s</DataType>
     </column>
-    <key id="356" parent="338" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <ColNames>MessageId</ColNames>
-      <Primary>1</Primary>
-    </key>
-    <column id="357" parent="339" name="VideoID">
-      <Position>1</Position>
-      <DataType>varchar(255)|0s</DataType>
-    </column>
-    <column id="358" parent="339" name="VideoTitle">
-      <Position>2</Position>
-      <DataType>varchar(255)|0s</DataType>
-    </column>
-    <column id="359" parent="339" name="ChannelName">
-      <Position>3</Position>
-      <DataType>varchar(255)|0s</DataType>
-    </column>
-    <column id="360" parent="339" name="LastChecked">
+    <column id="356" parent="338" name="Time">
       <Position>4</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <column id="361" parent="339" name="VideoItag">
+    <key id="357" parent="338" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>MessageId</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="358" parent="339" name="VideoID">
+      <Position>1</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="359" parent="339" name="VideoTitle">
+      <Position>2</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="360" parent="339" name="ChannelName">
+      <Position>3</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="361" parent="339" name="LastChecked">
+      <Position>4</Position>
+      <DataType>timestamp|0s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>current_timestamp()</DefaultExpression>
+      <OnUpdate>current_timestamp()</OnUpdate>
+    </column>
+    <column id="362" parent="339" name="VideoItag">
       <Position>5</Position>
       <DataType>int(11)|0s</DataType>
     </column>
-    <column id="362" parent="339" name="AudioItag">
+    <column id="363" parent="339" name="AudioItag">
       <Position>6</Position>
       <DataType>int(11)|0s</DataType>
     </column>

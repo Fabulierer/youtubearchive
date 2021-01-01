@@ -41,7 +41,7 @@ public class UpdateVideo {
             checkDescription(con, v);
             PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
             ps.setTime(1, new Time(System.currentTimeMillis()));
-            ps.setString(2, v.details().videoId());
+            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             ps.execute();
         } catch (YoutubeException e) {
             Main.sendMessage(con, "Video with VideoID " + videoId + " couldn't be found. Did it get deleted?");
@@ -82,7 +82,7 @@ public class UpdateVideo {
                         "(?)," +
                         "(?))");
                 ps.setString(1, v.details().videoId());
-                ps.setTime(2, new Time(System.currentTimeMillis()));
+                ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 ps.execute();
                 ps = con.prepareStatement("SELECT VideoVersionID FROM archivedvideo " +
                         "WHERE VideoID = (?) ORDER BY Time DESC");
@@ -145,7 +145,7 @@ public class UpdateVideo {
                         "(?)," +
                         "(?))");
                 ps.setString(1, v.details().videoId());
-                ps.setTime(2, new Time(System.currentTimeMillis()));
+                ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 ps.execute();
                 ps = con.prepareStatement("SELECT AudioVersionID FROM archivedaudio " +
                         "WHERE VideoID = (?) ORDER BY Time DESC");
@@ -198,7 +198,7 @@ public class UpdateVideo {
                         "(?)," +
                         "(?))");
                 ps.setString(1, v.details().videoId());
-                ps.setTime(2, new Time(System.currentTimeMillis()));
+                ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 ps.setString(3, v.details().description());
                 ps.execute();
                 rs = con.prepareStatement("SELECT Description FROM archiveddescription " +
