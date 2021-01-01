@@ -211,7 +211,6 @@ public class Main {
                             "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
-                            "Description varchar(5000)," +
                             "PRIMARY KEY (DescriptionVersionID))").execute();
                     break;
                 case "Messages":

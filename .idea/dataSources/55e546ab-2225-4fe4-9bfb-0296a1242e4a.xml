@@ -1101,109 +1101,105 @@
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <column id="348" parent="336" name="Description">
-      <Position>4</Position>
-      <DataType>varchar(5000)|0s</DataType>
-    </column>
-    <key id="349" parent="336" name="PRIMARY">
+    <key id="348" parent="336" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>DescriptionVersionID</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="350" parent="337" name="ThumbnailVersionID">
+    <column id="349" parent="337" name="ThumbnailVersionID">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="351" parent="337" name="VideoID">
+    <column id="350" parent="337" name="VideoID">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="352" parent="337" name="Time">
+    <column id="351" parent="337" name="Time">
       <Position>3</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <key id="353" parent="337" name="PRIMARY">
+    <key id="352" parent="337" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>ThumbnailVersionID</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="354" parent="338" name="VideoVersionID">
+    <column id="353" parent="338" name="VideoVersionID">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="355" parent="338" name="VideoID">
+    <column id="354" parent="338" name="VideoID">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="356" parent="338" name="Time">
+    <column id="355" parent="338" name="Time">
       <Position>3</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <key id="357" parent="338" name="PRIMARY">
+    <key id="356" parent="338" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>VideoVersionID</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="358" parent="339" name="MessageId">
+    <column id="357" parent="339" name="MessageId">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>null</SequenceIdentity>
     </column>
-    <column id="359" parent="339" name="Message">
+    <column id="358" parent="339" name="Message">
       <Position>2</Position>
       <DataType>varchar(511)|0s</DataType>
     </column>
-    <column id="360" parent="339" name="MessageRead">
+    <column id="359" parent="339" name="MessageRead">
       <Position>3</Position>
       <DataType>tinyint(1)|0s</DataType>
     </column>
-    <column id="361" parent="339" name="Time">
+    <column id="360" parent="339" name="Time">
       <Position>4</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <key id="362" parent="339" name="PRIMARY">
+    <key id="361" parent="339" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>MessageId</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="363" parent="340" name="VideoID">
+    <column id="362" parent="340" name="VideoID">
       <Position>1</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="364" parent="340" name="VideoTitle">
+    <column id="363" parent="340" name="VideoTitle">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="365" parent="340" name="ChannelName">
+    <column id="364" parent="340" name="ChannelName">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="366" parent="340" name="LastChecked">
+    <column id="365" parent="340" name="LastChecked">
       <Position>4</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <column id="367" parent="340" name="VideoItag">
+    <column id="366" parent="340" name="VideoItag">
       <Position>5</Position>
       <DataType>int(11)|0s</DataType>
     </column>
-    <column id="368" parent="340" name="AudioItag">
+    <column id="367" parent="340" name="AudioItag">
       <Position>6</Position>
       <DataType>int(11)|0s</DataType>
     </column>

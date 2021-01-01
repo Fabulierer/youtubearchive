@@ -207,35 +207,46 @@ public class UpdateVideo {
 
     private static void checkDescription(Connection con, YoutubeVideo v) {
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT Description FROM archiveddescription " +
+            PreparedStatement ps = con.prepareStatement("SELECT DescriptionVersionID FROM archiveddescription " +
                     "WHERE VideoID = (?) ORDER BY Time DESC");
             ps.setString(1, v.details().videoId());
             ResultSet rs = ps.executeQuery();
-
             boolean descriptionChanged;
-            String oldDescription = ".";
+            String versionId = "";
+            File downloadedFile = new File("./temp.txt");
+            FileUtils.writeStringToFile(downloadedFile, v.details().description(), "UTF-8");
             if (rs.next()) {
-                oldDescription = rs.getString(1);
-                descriptionChanged = !oldDescription.equals(v.details().description());
+                versionId = rs.getString(1);
+                File newestBackup = new File("./storage/" + v.details().videoId() + "/description/"
+                        + versionId + ".txt");
+                descriptionChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/description/");
+                Path storage = Paths.get("./storage/" + v.details().videoId() + "/description/");
+                Files.createDirectories(storage);
                 descriptionChanged = true;
             }
             if (descriptionChanged) {
                 System.out.println("Description change detected! Archiving description...");
                 ps = con.prepareStatement("INSERT INTO archiveddescription VALUES(" +
                         "NULL," +
-                        "?," +
                         "(?)," +
                         "(?))");
                 ps.setString(1, v.details().videoId());
                 ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                ps.setString(3, v.details().description());
                 ps.execute();
-                rs = con.prepareStatement("SELECT Description FROM archiveddescription " +
-                        "WHERE VideoID = '" + v.details().videoId() + "' ORDER BY Time DESC").executeQuery();
+                ps = con.prepareStatement("SELECT DescriptionVersionID FROM archiveddescription " +
+                        "WHERE VideoID = (?) ORDER BY Time DESC");
+                ps.setString(1, v.details().videoId());
+                rs = ps.executeQuery();
                 rs.next();
-                String newDescription = rs.getString(1);
-                if (oldDescription.equals(newDescription)) {
+                String newVersionId = rs.getString(1);
+                if (versionId.equals(newVersionId)) {
+                    throw new FileDownloadFailedException();
+                }
+                File copyTarget = new File("./storage/" + v.details().videoId() + "/description/" +
+                        newVersionId + ".txt");
+                if (!downloadedFile.renameTo(copyTarget)) {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the description!");
@@ -248,7 +259,8 @@ public class UpdateVideo {
                 System.out.println("There were no description changes detected!");
             }
         } catch (SQLException |
-                FileDownloadFailedException e) {
+                FileDownloadFailedException |
+                IOException e) {
             e.printStackTrace();
         }
     }
