@@ -108,7 +108,7 @@ public class Main {
                         break;
                     case "messages":
                     case "m":
-                        printTableMax(con.prepareStatement("SELECT * FROM messages").executeQuery());
+                        printTableMax(con.prepareStatement("SELECT Time, Message, MessageRead FROM messages ORDER BY Time DESC").executeQuery());
                         con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
                         break;
                     case "cleanmessages":

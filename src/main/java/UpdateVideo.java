@@ -100,7 +100,7 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the video!");
-                Main.sendMessage(con, "Video with ID " + v.details().videoId() + " changed!");
+                Main.sendMessage(con, "Video \"" + v.details().title().substring(0, 20) + "\" changed!");
             } else {
                 System.out.println("There were no video changes detected!");
             }
@@ -162,7 +162,7 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the audio!");
-                Main.sendMessage(con, "Audio of video with ID " + v.details().videoId() + " changed!");
+                Main.sendMessage(con, "Audio of video \"" + v.details().title().substring(0, 20) + "\" changed!");
             } else {
                 System.out.println("There were no audio changes detected!");
             }
@@ -209,7 +209,7 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the description!");
-                Main.sendMessage(con, "Description of video with ID " + v.details().videoId() + " changed!");
+                Main.sendMessage(con, "Description of video \"" + v.details().title().substring(0, 20) + "\" changed!");
             } else {
                 System.out.println("There were no description changes detected!");
             }
