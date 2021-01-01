@@ -14,13 +14,19 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] arguments) throws IOException, DatabaseConnectionFailedException {
-        File settings = new File("./sqlsettings.txt");
+        File[] computerDrives = File.listRoots();
+        File settings = new File("./settings.txt");
         if (settings.createNewFile()) {
-            System.out.println("New SQL Settings file created!");
+            System.out.println("New Settings file created!");
             FileWriter fileWriter = new FileWriter(settings);
-            fileWriter.write("url=\nuser=\npassword=");
+            fileWriter.write("url \nuser \npassword \ndrive ");
             fileWriter.close();
-        } else System.out.println("SQL Settings file found...");
+            System.out.println("The following drives have been found. Please pick one in the \"settings.txt\" file.");
+            for (int i = 0; i < computerDrives.length; i++) {
+                System.out.println(i + ": " + computerDrives[i]);
+            }
+            return;
+        } else System.out.println("Settings file found...");
 
         Scanner settingsScanner = new Scanner(settings);
 
@@ -28,8 +34,9 @@ public class Main {
             String url = settingsScanner.nextLine().split(" ")[1];
             String user = settingsScanner.nextLine().split(" ")[1];
             String password = settingsScanner.nextLine().split(" ")[1];
+            int drive = Integer.parseInt(settingsScanner.nextLine().split(" ")[1]);
 
-            System.out.println("SQL Settings successfully loaded!");
+            System.out.println("Settings successfully loaded!");
             System.out.println("Trying to connect to database...");
 
             Connection con = DriverManager.getConnection(url, user, password);
@@ -58,6 +65,8 @@ public class Main {
             boolean quit = false;
             while (!quit) {
                 checkUnreadMessages(con);
+                System.out.println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
+                        " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
 
                 Scanner scan = new Scanner(System.in);
                 System.out.print("YoutubeArchive> ");
