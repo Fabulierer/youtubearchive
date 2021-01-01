@@ -6,10 +6,12 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -57,6 +59,8 @@ public class UpdateVideo {
             checkVideoFile(con, v);
             checkAudioFile(con, v);
             checkDescription(con, v);
+            checkThumbnail(con, v);
+            v.details().thumbnails().forEach(image -> System.out.println("Thumbnail: " + image));
             PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
             ps.setTime(1, new Time(System.currentTimeMillis()));
             ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
@@ -118,7 +122,11 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the video!");
-                Main.sendMessage(con, "Video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                if (v.details().title().length() >= 20) {
+                    Main.sendMessage(con, "Video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                } else {
+                    Main.sendMessage(con, "Video \"" + v.details().title() + "\" changed!");
+                }
             } else {
                 System.out.println("There were no video changes detected!");
             }
@@ -180,7 +188,11 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the audio!");
-                Main.sendMessage(con, "Audio of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                if (v.details().title().length() >= 20) {
+                    Main.sendMessage(con, "Audio of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                } else {
+                    Main.sendMessage(con, "Audio of video \"" + v.details().title() + "\" changed!");
+                }
             } else {
                 System.out.println("There were no audio changes detected!");
             }
@@ -227,12 +239,77 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the description!");
-                Main.sendMessage(con, "Description of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                if (v.details().title().length() >= 20) {
+                    Main.sendMessage(con, "Description of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                } else {
+                    Main.sendMessage(con, "Description of video \"" + v.details().title() + "\" changed!");
+                }
             } else {
                 System.out.println("There were no description changes detected!");
             }
         } catch (SQLException |
                 FileDownloadFailedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void checkThumbnail(Connection con, YoutubeVideo v) {
+        try {
+            List<String> th = v.details().thumbnails();
+            File downloadedFile = new File("./temp.webp");
+            FileUtils.copyURLToFile(new URL(th.get(th.size() - 1)), downloadedFile);
+            PreparedStatement ps = con.prepareStatement("SELECT ThumbnailVersionID FROM archivedthumbnail " +
+                    "WHERE VideoID = (?) ORDER BY Time DESC");
+            ps.setString(1, v.details().videoId());
+            ResultSet rs = ps.executeQuery();
+            boolean thumbnailChanged;
+            String versionId = "";
+            if (rs.next()) {
+                versionId = rs.getString(1);
+                File newestBackup = new File("./storage/" + v.details().videoId() + "/thumbnail/"
+                        + versionId + ".webp");
+                thumbnailChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
+            } else {
+                System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/thumbnail/");
+                Path storage = Paths.get("./storage/" + v.details().videoId() + "/thumbnail/");
+                Files.createDirectories(storage);
+                thumbnailChanged = true;
+            }
+            if (thumbnailChanged) {
+                System.out.println("Thumbnail change detected! Thumbnail audio...");
+                ps = con.prepareStatement("INSERT INTO archivedthumbnail VALUES(" +
+                        "NULL," +
+                        "(?)," +
+                        "(?))");
+                ps.setString(1, v.details().videoId());
+                ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                ps.execute();
+                ps = con.prepareStatement("SELECT ThumbnailVersionID FROM archivedthumbnail " +
+                        "WHERE VideoID = (?) ORDER BY Time DESC");
+                ps.setString(1, v.details().videoId());
+                rs = ps.executeQuery();
+                rs.next();
+                String newVersionId = rs.getString(1);
+                if (versionId.equals(newVersionId)) {
+                    throw new FileDownloadFailedException();
+                }
+                File copyTarget = new File("./storage/" + v.details().videoId() + "/thumbnail/" +
+                        newVersionId + ".webp");
+                if (!downloadedFile.renameTo(copyTarget)) {
+                    throw new FileDownloadFailedException();
+                }
+                System.out.println("Successfully archived the thumbnail!");
+                if (v.details().title().length() >= 20) {
+                    Main.sendMessage(con, "Thumbnail of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                } else {
+                    Main.sendMessage(con, "Thumbnail of video \"" + v.details().title() + "\" changed!");
+                }
+            } else {
+                System.out.println("There were no thumbnail changes detected!");
+            }
+        } catch (SQLException |
+                FileDownloadFailedException |
+                IOException e) {
             e.printStackTrace();
         }
     }

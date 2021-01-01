@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] arguments) throws IOException, WrongSettingsFileException, DatabaseConnectionFailedException {
+    public static void main(String[] arguments) throws IOException, DatabaseConnectionFailedException {
         File settings = new File("./sqlsettings.txt");
         if (settings.createNewFile()) {
             System.out.println("New SQL Settings file created!");
@@ -40,6 +40,7 @@ public class Main {
             checkTable("ArchivedVideo", con);
             checkTable("ArchivedAudio", con);
             checkTable("ArchivedDescription", con);
+            checkTable("ArchivedThumbnail", con);
             checkTable("Messages", con);
 
             System.out.println("Checking if 'storage' directory exists...");
@@ -159,13 +160,11 @@ public class Main {
                 }
             }
             if (UpdateVideo.t != null) UpdateVideo.t.cancel();
-        } catch (IndexOutOfBoundsException e) {
-            throw new WrongSettingsFileException();
+        } catch (IndexOutOfBoundsException | TableCreationFailedException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DatabaseConnectionFailedException();
-        } catch (TableCreationFailedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -199,6 +198,13 @@ public class Main {
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (AudioVersionID))").execute();
+                    break;
+                case "ArchivedThumbnail":
+                    con.prepareStatement("CREATE TABLE ArchivedThumbnail(" +
+                            "ThumbnailVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time TIMESTAMP," +
+                            "PRIMARY KEY (ThumbnailVersionID))").execute();
                     break;
                 case "ArchivedDescription":
                     con.prepareStatement("CREATE TABLE ArchivedDescription(" +
