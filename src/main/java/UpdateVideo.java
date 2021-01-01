@@ -29,7 +29,7 @@ public class UpdateVideo {
             }
         };
         t = new Timer();
-        t.scheduleAtFixedRate(tt, 0L, 3600000L);
+        t.scheduleAtFixedRate(tt, 0L, 3600000L * hours);
 
     }
 
