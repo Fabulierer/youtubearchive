@@ -10,8 +10,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class UpdateVideo {
+
+    public static Timer t;
+
+    public static void scheduleUpdate(final Connection con, int hours) {
+        TimerTask tt = new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("Starting Scheduled Update!");
+                checkAll(con);
+                System.out.print("Scheduled Update complete!\nYoutubeArchive> ");
+            }
+        };
+        t = new Timer();
+        t.scheduleAtFixedRate(tt, 0L, 3600000L);
+
+    }
 
     public static void checkAll(Connection con) {
         try {

@@ -84,6 +84,15 @@ public class Main {
                     case "ua":
                         UpdateVideo.checkAll(con);
                         break;
+                    case "scheduleupdate":
+                    case "su":
+                        if (args.length > 1) {
+                            UpdateVideo.scheduleUpdate(con, Integer.parseInt(args[1]));
+                        } else {
+                            UpdateVideo.scheduleUpdate(con, 24);
+                        }
+
+                        break;
                     case "status":
                     case "s":
                         int length;
@@ -149,6 +158,7 @@ public class Main {
                         break;
                 }
             }
+            if (UpdateVideo.t != null) UpdateVideo.t.cancel();
         } catch (IndexOutOfBoundsException e) {
             throw new WrongSettingsFileException();
         } catch (SQLException e) {
