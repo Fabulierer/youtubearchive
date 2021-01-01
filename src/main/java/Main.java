@@ -109,9 +109,9 @@ public class Main {
                         PreparedStatement ps = con.prepareStatement("SELECT SUBSTRING(VideoTitle, 1, (?)) AS Title," +
                                 "ChannelName AS Channel," +
                                 "LastChecked," +
-                                "(SELECT COUNT(y.VideoID) FROM archivedvideo y WHERE x.VideoID = y.VideoID) AS VideoChanged," +
-                                "(SELECT COUNT(y.VideoID) FROM archivedaudio y WHERE x.VideoID = y.VideoID) AS AudioChanged," +
-                                "(SELECT COUNT(y.VideoID) FROM archiveddescription y WHERE x.VideoID = y.VideoID) AS DescriptionChanged " +
+                                "(SELECT COUNT(y.VideoID) - 1 FROM archivedvideo y WHERE x.VideoID = y.VideoID) AS VideoChanged," +
+                                "(SELECT COUNT(y.VideoID) - 1 FROM archivedaudio y WHERE x.VideoID = y.VideoID) AS AudioChanged," +
+                                "(SELECT COUNT(y.VideoID) - 1 FROM archiveddescription y WHERE x.VideoID = y.VideoID) AS DescriptionChanged " +
                                 "FROM videolist x");
                         ps.setInt(1, length);
                         ResultSet rs = ps.executeQuery();
