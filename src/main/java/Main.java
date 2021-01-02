@@ -1,5 +1,4 @@
 import com.github.kiulian.downloader.YoutubeException;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -198,7 +197,7 @@ public class Main {
         try {
             con.prepareStatement("SELECT * FROM " + tableName).executeQuery();
             System.out.println("Found the " + tableName + " Table.");
-        } catch (MySQLSyntaxErrorException e) {
+        } catch (SQLSyntaxErrorException e) {
             System.out.println("Couldn't find table '" + tableName + "'. Creating a new one...");
             switch (tableName) {
                 case "VideoList":
@@ -259,7 +258,7 @@ public class Main {
             try {
                 con.prepareStatement("SELECT * FROM " + tableName).executeQuery();
                 System.out.println("Successfully created the new Table!");
-            } catch (MySQLSyntaxErrorException ee) {
+            } catch (SQLSyntaxErrorException ee) {
                 ee.printStackTrace();
                 throw new TableCreationFailedException();
             }

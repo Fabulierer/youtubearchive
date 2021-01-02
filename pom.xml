@@ -19,9 +19,15 @@
             <version>2.4.5</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.45</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -70,8 +76,6 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 
