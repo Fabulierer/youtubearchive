@@ -139,7 +139,7 @@ public class Main {
                         printTableMax(con.prepareStatement("SELECT Time, Message, MessageRead FROM messages ORDER BY Time DESC").executeQuery());
                         con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
                         break;
-                    case "cleanmessages":
+                    case "clearmessages":
                     case "cm":
                         con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
                         System.out.println("Unread Messages have been removed!");
@@ -163,9 +163,14 @@ public class Main {
                     case "h":
                         System.out.println("Help:\n" +
                                 "addvideo/av (videoId) | adds a video to the list.\n" +
+                                "addplaylist/ap (playlistID) | adds every video from a playlist to the list\n" +
                                 "update/u (videoId) | manually update a video\n" +
                                 "updateall/ua | manually update every video\n" +
-                                "status/s | Shows the status of all videos\n" +
+                                "scheduleupdate/su | schedule an update for every video\n" +
+                                "status/s | shows the status of all videos\n" +
+                                "messages/m | show messages\n" +
+                                "clearmessages/cm | delete already read messages\n" +
+                                "wipe/w | wipes everything\n" +
                                 "help/h | this\n" +
                                 "quit/q | obvious");
                         break;
