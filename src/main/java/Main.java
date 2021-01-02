@@ -43,7 +43,7 @@ public class Main {
             con.prepareStatement("SET CHARACTER SET utf8").execute();
             System.out.println("Successfully connected to database!");
 
-            checkTable("videoList", con);
+            checkTable("videolist", con);
             checkTable("archivedvideo", con);
             checkTable("archivedaudio", con);
             checkTable("archiveddescription", con);
