@@ -43,13 +43,13 @@ public class Main {
             con.prepareStatement("SET CHARACTER SET utf8").execute();
             System.out.println("Successfully connected to database!");
 
-            checkTable("VideoList", con);
-            checkTable("ArchivedVideo", con);
-            checkTable("ArchivedAudio", con);
-            checkTable("ArchivedDescription", con);
-            checkTable("ArchivedThumbnail", con);
-            checkTable("ArchivedTitle", con);
-            checkTable("Messages", con);
+            checkTable("videoList", con);
+            checkTable("archivedvideo", con);
+            checkTable("archivedaudio", con);
+            checkTable("archiveddescription", con);
+            checkTable("archivedthumbnail", con);
+            checkTable("archivedtitle", con);
+            checkTable("messages", con);
 
             System.out.println("Checking if 'storage' directory exists...");
             Path storage = Paths.get("./storage/");
@@ -200,8 +200,8 @@ public class Main {
         } catch (SQLSyntaxErrorException e) {
             System.out.println("Couldn't find table '" + tableName + "'. Creating a new one...");
             switch (tableName) {
-                case "VideoList":
-                    con.prepareStatement("CREATE TABLE VideoList(" +
+                case "videolist":
+                    con.prepareStatement("CREATE TABLE videolist(" +
                             "VideoID varchar(255)," +
                             "VideoTitle varchar(255)," +
                             "ChannelName varchar(255)," +
@@ -209,43 +209,43 @@ public class Main {
                             "VideoItag int," +
                             "AudioItag int)").execute();
                     break;
-                case "ArchivedVideo":
-                    con.prepareStatement("CREATE TABLE ArchivedVideo(" +
+                case "archivedvideo":
+                    con.prepareStatement("CREATE TABLE archivedvideo(" +
                             "VideoVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (VideoVersionID))").execute();
                     break;
-                case "ArchivedAudio":
-                    con.prepareStatement("CREATE TABLE ArchivedAudio(" +
+                case "archivedaudio":
+                    con.prepareStatement("CREATE TABLE archivedaudio(" +
                             "AudioVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (AudioVersionID))").execute();
                     break;
-                case "ArchivedDescription":
-                    con.prepareStatement("CREATE TABLE ArchivedDescription(" +
+                case "archiveddescription":
+                    con.prepareStatement("CREATE TABLE archiveddescription(" +
                             "DescriptionVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (DescriptionVersionID))").execute();
                     break;
-                case "ArchivedThumbnail":
-                    con.prepareStatement("CREATE TABLE ArchivedThumbnail(" +
+                case "archivedthumbnail":
+                    con.prepareStatement("CREATE TABLE archivedthumbnail(" +
                             "ThumbnailVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (ThumbnailVersionID))").execute();
                     break;
-                case "ArchivedTitle":
-                    con.prepareStatement("CREATE TABLE ArchivedTitle(" +
+                case "archivedtitle":
+                    con.prepareStatement("CREATE TABLE archivedtitle(" +
                             "TitleVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (TitleVersionID))").execute();
                     break;
-                case "Messages":
-                    con.prepareStatement("CREATE TABLE Messages(" +
+                case "messages":
+                    con.prepareStatement("CREATE TABLE messages(" +
                             "MessageId int NOT NULL AUTO_INCREMENT," +
                             "Message varchar(511)," +
                             "MessageRead BOOLEAN," +
