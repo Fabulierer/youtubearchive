@@ -7,6 +7,7 @@ import com.github.kiulian.downloader.model.playlist.PlaylistVideoDetails;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class AddVideo {
@@ -31,14 +32,15 @@ public class AddVideo {
                         "VALUES((?)," +
                         "(?)," +
                         "(?)," +
-                        "NULL," +
+                        "(?)," +
                         "(?)," +
                         "(?))");
                 ps.setString(1, id);
                 ps.setString(2, details.title());
                 ps.setString(3, details.author());
-                ps.setInt(4, formats[0]);
-                ps.setInt(5, formats[1]);
+                ps.setTimestamp(4, new Timestamp(1000));
+                ps.setInt(5, formats[0]);
+                ps.setInt(6, formats[1]);
                 ps.execute();
                 if (con.prepareStatement("SELECT VideoID FROM VideoList WHERE VideoID = '" + id + "'").executeQuery().next()){
                     System.out.println("Successfully added the video!");

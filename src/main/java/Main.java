@@ -147,7 +147,9 @@ public class Main {
                     case "wipe":
                     case "w":
                         if (new File("wipe").exists()) {
-                            con.prepareStatement("DROP TABLE archivedaudio, archiveddescription, archivedvideo, messages, videolist").execute();
+                            con.prepareStatement("DROP TABLE " +
+                                    "archivedaudio, archiveddescription, archivedthumbnail, archivedtitle," +
+                                    "archivedvideo, messages, videolist").execute();
                             System.out.println("Database has been wiped!");
                             FileUtils.deleteDirectory(new File("storage"));
                             System.out.println("Storage has been wiped!");

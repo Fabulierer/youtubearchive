@@ -62,8 +62,8 @@ public class UpdateVideo {
             checkThumbnail(con, v);
             checkTitle(con, v);
             PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
-            ps.setTime(1, new Time(System.currentTimeMillis()));
-            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            ps.setString(2, videoId);
             ps.execute();
         } catch (YoutubeException e) {
             Main.sendMessage(con, "Video with VideoID " + videoId + " couldn't be found. Did it get deleted?");
@@ -184,6 +184,8 @@ public class UpdateVideo {
                 }
                 File copyTarget = new File("./storage/" + v.details().videoId() + "/audio/" +
                         newVersionId + "." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
+                System.out.println(copyTarget.getAbsolutePath());
+                System.out.println(downloadedFile.getAbsolutePath());
                 if (!downloadedFile.renameTo(copyTarget)) {
                     throw new FileDownloadFailedException();
                 }
@@ -397,6 +399,8 @@ public class UpdateVideo {
     }
 
     private static String findAudioVideoFormatByMimeType(String mimeType) throws VideoCodecNotFoundException {
+        if (mimeType.equals("audio/mp4; codecs=\"mp4a.40.2\"")) return "m4a";
+        if (mimeType.contains("m4a")) return "m4a";
         if (mimeType.contains("webm")) return "webm";
         if (mimeType.contains("mp4")) return "mp4";
         if (mimeType.contains("flv")) return "flv";
