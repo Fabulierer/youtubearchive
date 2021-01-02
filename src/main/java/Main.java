@@ -64,7 +64,7 @@ public class Main {
 
             boolean quit = false;
             while (!quit) {
-                checkUnreadMessages(con);
+                checkUnreadmessages(con);
                 System.out.println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
                         " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
 
@@ -141,7 +141,7 @@ public class Main {
                     case "clearmessages":
                     case "cm":
                         con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
-                        System.out.println("Unread Messages have been removed!");
+                        System.out.println("Unread messages have been removed!");
                         break;
                     case "wipe":
                     case "w":
@@ -346,11 +346,11 @@ public class Main {
         System.out.println();
     }
 
-    private static void checkUnreadMessages(Connection con) throws SQLException {
+    private static void checkUnreadmessages(Connection con) throws SQLException {
         ResultSet rs = con.prepareStatement("SELECT * FROM messages WHERE MessageRead = 0").executeQuery();
-        int unreadMessages = 0;
-        while (rs.next()) unreadMessages++;
-        if (unreadMessages != 0) System.out.println("You have " + unreadMessages + " unread messages!");
+        int unreadmessages = 0;
+        while (rs.next()) unreadmessages++;
+        if (unreadmessages != 0) System.out.println("You have " + unreadmessages + " unread messages!");
     }
 
 }
