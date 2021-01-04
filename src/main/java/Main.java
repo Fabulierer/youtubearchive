@@ -30,165 +30,208 @@ public class Main {
 
         Scanner settingsScanner = new Scanner(settings);
 
-        try {
-            String url = settingsScanner.nextLine().split(" ")[1];
-            String user = settingsScanner.nextLine().split(" ")[1];
-            String password = settingsScanner.nextLine().split(" ")[1];
-            int drive = Integer.parseInt(settingsScanner.nextLine().split(" ")[1]);
-
-            System.out.println("Settings successfully loaded!");
-            System.out.println("Trying to connect to database...");
-
-            Connection con = DriverManager.getConnection(url, user, password);
-            con.prepareStatement("SET CHARACTER SET utf8").execute();
-            System.out.println("Successfully connected to database!");
-
-            checkTable("videolist", con);
-            checkTable("archivedvideo", con);
-            checkTable("archivedaudio", con);
-            checkTable("archiveddescription", con);
-            checkTable("archivedthumbnail", con);
-            checkTable("archivedtitle", con);
-            checkTable("messages", con);
-
-            System.out.println("Checking if 'storage' directory exists...");
-            Path storage = Paths.get("./storage/");
+        boolean quit = false;
+        while (!quit) {
             try {
-                Files.createDirectory(storage);
-                System.out.println("Directory 'storage' has been created.");
-            } catch (FileAlreadyExistsException e) {
-                System.out.println("Directory 'storage' already exists.");
-            }
+                String url = settingsScanner.nextLine().split(" ")[1];
+                String user = settingsScanner.nextLine().split(" ")[1];
+                String password = settingsScanner.nextLine().split(" ")[1];
+                int drive = Integer.parseInt(settingsScanner.nextLine().split(" ")[1]);
 
-            System.out.println();
+                System.out.println("Settings successfully loaded!");
+                System.out.println("Trying to connect to database...");
 
-            boolean quit = false;
-            while (!quit) {
-                checkUnreadmessages(con);
-                System.out.println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
-                        " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
+                Connection con = DriverManager.getConnection(url, user, password);
+                con.prepareStatement("SET CHARACTER SET utf8").execute();
+                System.out.println("Successfully connected to database!");
 
-                Scanner scan = new Scanner(System.in);
-                System.out.print("YoutubeArchive> ");
-                String cmd = scan.nextLine();
-                String[] args = cmd.split(" ");
-                args[0] = args[0].toLowerCase();
+                checkTable("videolist", con);
+                checkTable("archivedvideo", con);
+                checkTable("archivedaudio", con);
+                checkTable("archiveddescription", con);
+                checkTable("archivedthumbnail", con);
+                checkTable("archivedtitle", con);
+                checkTable("messages", con);
 
-                switch (args[0]) {
-                    case "addvideo":
-                    case "av":
-                        if (args.length > 1) {
-                            AddVideo.addVideo(args[1], con);
-                        } else {
-                            System.out.println("You need to use at least 1 Parameter! Use h for more information!");
-                        }
-                        break;
-                    case "addplaylist":
-                    case "ap":
-                        if (args.length > 1) {
-                            AddVideo.addPlaylist(args[1], con);
-                        } else {
-                            System.out.println("You need to use at least 1 Parameter! Use h for more information!");
-                        }
-                        break;
-                    case "update":
-                    case "u":
-                        if (args.length > 1) {
-                            UpdateVideo.checkVideo(args[1], con);
-                        } else {
+                System.out.println("Checking if 'storage' directory exists...");
+                Path storage = Paths.get("./storage/");
+                try {
+                    Files.createDirectory(storage);
+                    System.out.println("Directory 'storage' has been created.");
+                } catch (FileAlreadyExistsException e) {
+                    System.out.println("Directory 'storage' already exists.");
+                }
+
+                System.out.println();
+
+                while (!quit) {
+                    checkUnreadmessages(con);
+                    System.out.println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
+                            " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
+
+                    Scanner scan = new Scanner(System.in);
+                    System.out.print("YoutubeArchive> ");
+                    String cmd = scan.nextLine();
+                    String[] args = cmd.split(" ");
+                    args[0] = args[0].toLowerCase();
+
+                    switch (args[0]) {
+                        case "addvideo":
+                        case "av":
+                            if (args.length > 1) {
+                                AddVideo.addVideo(args[1], con);
+                            } else {
+                                System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                            }
+                            break;
+                        case "addplaylist":
+                        case "ap":
+                            if (args.length > 1) {
+                                AddVideo.addPlaylist(args[1], con);
+                            } else {
+                                System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                            }
+                            break;
+                        case "update":
+                        case "u":
+                            if (args.length > 1) {
+                                UpdateVideo.checkVideo(args[1], con);
+                            } else {
+                                UpdateVideo.checkAll(con);
+                            }
+                            break;
+                        case "updateall":
+                        case "ua":
                             UpdateVideo.checkAll(con);
-                        }
-                        break;
-                    case "updateall":
-                    case "ua":
-                        UpdateVideo.checkAll(con);
-                        break;
-                    case "scheduleupdate":
-                    case "su":
-                        if (args.length > 1) {
-                            UpdateVideo.scheduleUpdate(con, Integer.parseInt(args[1]));
-                        } else {
-                            UpdateVideo.scheduleUpdate(con, 24);
-                        }
-                        break;
-                    case "status":
-                    case "s":
-                        int length;
-                        if (args.length == 1) {
-                            length = 25;
-                        }
-                        else if (Integer.parseInt(args[1]) < 12) {
-                            length = 25;
-                            System.out.println("Length must be at least 12!");
-                        }
-                        else length = Integer.parseInt(args[1]);
-                        PreparedStatement ps = con.prepareStatement("SELECT SUBSTRING(VideoTitle, 1, (?)) AS Title," +
-                                "ChannelName AS Channel," +
-                                "LastChecked," +
-                                "(SELECT COUNT(y.VideoID) - 1 FROM archivedvideo y WHERE x.VideoID = y.VideoID) AS VideoChanged," +
-                                "(SELECT COUNT(y.VideoID) - 1 FROM archivedaudio y WHERE x.VideoID = y.VideoID) AS AudioChanged," +
-                                "(SELECT COUNT(y.VideoID) - 1 FROM archiveddescription y WHERE x.VideoID = y.VideoID) AS DescriptionChanged " +
-                                "FROM videolist x");
-                        ps.setInt(1, length);
-                        ResultSet rs = ps.executeQuery();
-                        printTable(rs, length);
-                        break;
-                    case "messages":
-                    case "m":
-                        printTableMax(con.prepareStatement("SELECT Time, Message, MessageRead FROM messages ORDER BY Time DESC").executeQuery());
-                        con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
-                        break;
-                    case "clearmessages":
-                    case "cm":
-                        con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
-                        System.out.println("Unread messages have been removed!");
-                        break;
-                    case "wipe":
-                    case "w":
-                        if (new File("wipe").exists()) {
-                            con.prepareStatement("DROP TABLE " +
-                                    "archivedaudio, archiveddescription, archivedthumbnail, archivedtitle," +
-                                    "archivedvideo, messages, videolist").execute();
-                            System.out.println("Database has been wiped!");
-                            FileUtils.deleteDirectory(new File("storage"));
-                            System.out.println("Storage has been wiped!");
+                            break;
+                        case "scheduleupdate":
+                        case "su":
+                            if (args.length > 1) {
+                                UpdateVideo.scheduleUpdate(con, Integer.parseInt(args[1]));
+                            } else {
+                                UpdateVideo.scheduleUpdate(con, 24);
+                            }
+                            break;
+                        case "status":
+                        case "s":
+                            int length;
+                            if (args.length == 1) {
+                                length = 25;
+                            } else if (Integer.parseInt(args[1]) < 12) {
+                                length = 25;
+                                System.out.println("Length must be at least 12!");
+                            } else length = Integer.parseInt(args[1]);
+                            PreparedStatement ps = con.prepareStatement("SELECT SUBSTRING(VideoTitle, 1, (?)) AS Title," +
+                                    "ChannelName AS Channel," +
+                                    "LastChecked," +
+                                    "(SELECT COUNT(y.VideoID) - 1 FROM archivedvideo y WHERE x.VideoID = y.VideoID) AS VideoChanged," +
+                                    "(SELECT COUNT(y.VideoID) - 1 FROM archivedaudio y WHERE x.VideoID = y.VideoID) AS AudioChanged," +
+                                    "(SELECT COUNT(y.VideoID) - 1 FROM archiveddescription y WHERE x.VideoID = y.VideoID) AS DescriptionChanged " +
+                                    "FROM videolist x");
+                            ps.setInt(1, length);
+                            ResultSet rs = ps.executeQuery();
+                            printTable(rs, length);
+                            break;
+                        case "messages":
+                        case "m":
+                            printTableMax(con.prepareStatement("SELECT Time, Message, MessageRead FROM messages ORDER BY Time DESC").executeQuery());
+                            con.prepareStatement("UPDATE messages SET MessageRead = 1 WHERE MessageRead = 0").execute();
+                            break;
+                        case "clearmessages":
+                        case "cm":
+                            con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
+                            System.out.println("Unread messages have been removed!");
+                            break;
+                        case "remove":
+                        case "r":
+                            if (args.length <= 2) {
+                                System.out.println("This command requires the use of 2 parameters! Check h for help.");
+                            } else {
+                                boolean correctArgument = false;
+                                if (args[1].equalsIgnoreCase("list") || args[1].equalsIgnoreCase("both")) {
+                                    ps = con.prepareStatement("DELETE FROM videolist WHERE VideoID = (?)");
+                                    ps.setString(1, args[2]);
+                                    ps.execute();
+                                    System.out.println("Successfully deleted the video of the list!");
+                                    correctArgument = true;
+                                }
+                                if (args[1].equalsIgnoreCase("storage") || args[1].equalsIgnoreCase("both")) {
+                                    ps = con.prepareStatement("DELETE FROM archivedaudio WHERE VideoID = (?)");
+                                    ps.setString(1, args[2]);
+                                    ps.execute();
+                                    ps = con.prepareStatement("DELETE FROM archiveddescription WHERE VideoID = (?)");
+                                    ps.setString(1, args[2]);
+                                    ps.execute();
+                                    ps = con.prepareStatement("DELETE FROM archivedthumbnail WHERE VideoID = (?)");
+                                    ps.setString(1, args[2]);
+                                    ps.execute();
+                                    ps = con.prepareStatement("DELETE FROM archivedtitle WHERE VideoID = (?)");
+                                    ps.setString(1, args[2]);
+                                    ps.execute();
+                                    ps = con.prepareStatement("DELETE FROM archivedvideo WHERE VideoID = (?)");
+                                    ps.setString(1, args[2]);
+                                    ps.execute();
+                                    File directory = new File("./storage/" + args[2]);
+                                    if (directory.delete()) {
+                                        System.out.println("Successfully deleted every saved file from the given video.");
+                                    } else {
+                                        System.out.println("Something went wrong while trying to delete the storage directory for the video.");
+                                    }
+                                    correctArgument = true;
+                                }
+                                if (!correctArgument) {
+                                    System.out.println("Your first argument needs to be either list, storage or both.");
+                                }
+                            }
+                            break;
+                        case "wipe":
+                        case "w":
+                            if (new File("wipe").exists()) {
+                                con.prepareStatement("DROP TABLE " +
+                                        "archivedaudio, archiveddescription, archivedthumbnail, archivedtitle," +
+                                        "archivedvideo, messages, videolist").execute();
+                                System.out.println("Database has been wiped!");
+                                FileUtils.deleteDirectory(new File("storage"));
+                                System.out.println("Storage has been wiped!");
+                                System.out.println("Quitting YoutubeArchive...");
+                                quit = true;
+                            } else {
+                                System.out.println("In order to complete a wipe, you must create a file called wipe.");
+                            }
+                            break;
+                        case "help":
+                        case "h":
+                            System.out.println("Help:\n" +
+                                    "addvideo/av (videoId) | adds a video to the list.\n" +
+                                    "addplaylist/ap (playlistID) | adds every video from a playlist to the list\n" +
+                                    "update/u <videoId> | manually update a video\n" +
+                                    "updateall/ua | manually update every video\n" +
+                                    "scheduleupdate/su | schedule an update for every video\n" +
+                                    "status/s | shows the status of all videos\n" +
+                                    "messages/m | show messages\n" +
+                                    "clearmessages/cm | delete already read messages\n" +
+                                    "remove/r (list/storage/both) (videoId) | removes from either list, storage or both\n" +
+                                    "wipe/w | wipes everything\n" +
+                                    "help/h | this\n" +
+                                    "quit/q | obvious");
+                            break;
+                        case "quit":
+                        case "q":
                             System.out.println("Quitting YoutubeArchive...");
                             quit = true;
-                        } else {
-                            System.out.println("In order to complete a wipe, you must create a file called wipe.");
-                        }
-                        break;
-                    case "help":
-                    case "h":
-                        System.out.println("Help:\n" +
-                                "addvideo/av (videoId) | adds a video to the list.\n" +
-                                "addplaylist/ap (playlistID) | adds every video from a playlist to the list\n" +
-                                "update/u (videoId) | manually update a video\n" +
-                                "updateall/ua | manually update every video\n" +
-                                "scheduleupdate/su | schedule an update for every video\n" +
-                                "status/s | shows the status of all videos\n" +
-                                "messages/m | show messages\n" +
-                                "clearmessages/cm | delete already read messages\n" +
-                                "wipe/w | wipes everything\n" +
-                                "help/h | this\n" +
-                                "quit/q | obvious");
-                        break;
-                    case "quit":
-                    case "q":
-                        System.out.println("Quitting YoutubeArchive...");
-                        quit = true;
-                        break;
-                    default:
-                        System.out.println("Unknown command! Use h for help!");
-                        break;
+                            break;
+                        default:
+                            System.out.println("Unknown command! Use h for help!");
+                            break;
+                    }
                 }
+                if (UpdateVideo.t != null) UpdateVideo.t.cancel();
+            } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DatabaseConnectionFailedException();
             }
-            if (UpdateVideo.t != null) UpdateVideo.t.cancel();
-        } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DatabaseConnectionFailedException();
         }
     }
 
