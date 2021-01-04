@@ -51,6 +51,7 @@ public class Main {
                 checkTable("archiveddescription", con);
                 checkTable("archivedthumbnail", con);
                 checkTable("archivedtitle", con);
+                checkTable("archivedtags", con);
                 checkTable("messages", con);
 
                 System.out.println("Checking if 'storage' directory exists...");
@@ -65,7 +66,7 @@ public class Main {
                 System.out.println();
 
                 while (!quit) {
-                    checkUnreadmessages(con);
+                    checkUnreadMessages(con);
                     System.out.println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
                             " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
 
@@ -287,6 +288,13 @@ public class Main {
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (TitleVersionID))").execute();
                     break;
+                case "archivedtags":
+                    con.prepareStatement("CREATE TABLE archivedtags(" +
+                            "TagsVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time TIMESTAMP," +
+                            "PRIMARY KEY (TagsVersionID))").execute();
+                    break;
                 case "messages":
                     con.prepareStatement("CREATE TABLE messages(" +
                             "MessageId int NOT NULL AUTO_INCREMENT," +
@@ -389,11 +397,11 @@ public class Main {
         System.out.println();
     }
 
-    private static void checkUnreadmessages(Connection con) throws SQLException {
+    private static void checkUnreadMessages(Connection con) throws SQLException {
         ResultSet rs = con.prepareStatement("SELECT * FROM messages WHERE MessageRead = 0").executeQuery();
-        int unreadmessages = 0;
-        while (rs.next()) unreadmessages++;
-        if (unreadmessages != 0) System.out.println("You have " + unreadmessages + " unread messages!");
+        int unreadMessages = 0;
+        while (rs.next()) unreadMessages++;
+        if (unreadMessages != 0) System.out.println("You have " + unreadMessages + " unread messages!");
     }
 
 }

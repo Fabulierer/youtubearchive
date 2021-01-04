@@ -61,6 +61,7 @@ public class UpdateVideo {
             checkDescription(con, v);
             checkThumbnail(con, v);
             checkTitle(con, v);
+            checkTags(con, v);
             PreparedStatement ps = con.prepareStatement("UPDATE videolist SET lastchecked = (?) WHERE VideoID = (?)");
             ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
             ps.setString(2, videoId);
@@ -380,6 +381,71 @@ public class UpdateVideo {
                 }
             } else {
                 System.out.println("There were no title changes detected!");
+            }
+        } catch (SQLException |
+                FileDownloadFailedException |
+                IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void checkTags(Connection con, YoutubeVideo v) {
+        try {
+            PreparedStatement ps = con.prepareStatement("SELECT TagsVersionID FROM archivedtags " +
+                    "WHERE VideoID = (?) ORDER BY Time DESC");
+            ps.setString(1, v.details().videoId());
+            ResultSet rs = ps.executeQuery();
+            boolean tagsChanged;
+            String versionId = "";
+            File downloadedFile = new File("./temp.txt");
+            StringBuilder tags = new StringBuilder();
+            List<String> keywords = v.details().keywords();
+            for (String keyword : keywords) {
+                tags.append(keyword);
+            }
+            FileUtils.writeStringToFile(downloadedFile, tags.toString(), "UTF-8");
+            if (rs.next()) {
+                versionId = rs.getString(1);
+                File newestBackup = new File("./storage/" + v.details().videoId() + "/tags/"
+                        + versionId + ".txt");
+                tagsChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
+            } else {
+                System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/tags/");
+                Path storage = Paths.get("./storage/" + v.details().videoId() + "/tags/");
+                Files.createDirectories(storage);
+                tagsChanged = true;
+            }
+            if (tagsChanged) {
+                System.out.println("Tags change detected! Archiving tags...");
+                ps = con.prepareStatement("INSERT INTO archivedtags VALUES(" +
+                        "NULL," +
+                        "(?)," +
+                        "(?))");
+                ps.setString(1, v.details().videoId());
+                ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                ps.execute();
+                ps = con.prepareStatement("SELECT TagsVersionID FROM archivedtags " +
+                        "WHERE VideoID = (?) ORDER BY Time DESC");
+                ps.setString(1, v.details().videoId());
+                rs = ps.executeQuery();
+                rs.next();
+                String newVersionId = rs.getString(1);
+                if (versionId.equals(newVersionId)) {
+                    throw new FileDownloadFailedException();
+                }
+                File copyTarget = new File("./storage/" + v.details().videoId() + "/tags/" +
+                        newVersionId + ".txt");
+                if (!downloadedFile.renameTo(copyTarget)) {
+                    throw new FileDownloadFailedException();
+                }
+                System.out.println("Successfully archived the tags!");
+                if (v.details().title().length() >= 20) {
+                    Main.sendMessage(con, "Tags of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                } else {
+                    Main.sendMessage(con, "Tags of video \"" + v.details().title() + "\" changed!");
+                }
+            } else {
+                System.out.println("There were no tag changes detected!");
             }
         } catch (SQLException |
                 FileDownloadFailedException |
