@@ -401,7 +401,7 @@ public class UpdateVideo {
             StringBuilder tags = new StringBuilder();
             List<String> keywords = v.details().keywords();
             for (String keyword : keywords) {
-                tags.append(keyword);
+                tags.append(keyword).append(",");
             }
             FileUtils.writeStringToFile(downloadedFile, tags.toString(), "UTF-8");
             if (rs.next()) {
