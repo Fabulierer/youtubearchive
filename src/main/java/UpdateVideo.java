@@ -91,12 +91,14 @@ public class UpdateVideo {
             boolean videoChanged;
             String versionId = "";
             File downloadedFile = new File("./temp." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
+            boolean firstSave = false;
             if (rs.next()) {
                 versionId = rs.getString(1);
                 File newestBackup = new File("./storage/" + v.details().videoId() + "/video/"
                         + versionId + "." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
                 videoChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                firstSave = true;
                 System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/video/");
                 Path storage = Paths.get("./storage/" + v.details().videoId() + "/video/");
                 Files.createDirectories(storage);
@@ -127,10 +129,12 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the video!");
-                if (v.details().title().length() >= 20) {
-                    Main.sendMessage(con, "Video \"" + v.details().title().substring(0, 20) + "\" changed!");
-                } else {
-                    Main.sendMessage(con, "Video \"" + v.details().title() + "\" changed!");
+                if (!firstSave) {
+                    if (v.details().title().length() >= 20) {
+                        Main.sendMessage(con, "Video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                    } else {
+                        Main.sendMessage(con, "Video \"" + v.details().title() + "\" changed!");
+                    }
                 }
             } else {
                 System.out.println("There were no video changes detected!");
@@ -158,12 +162,14 @@ public class UpdateVideo {
             boolean audioChanged;
             String versionId = "";
             File downloadedFile = new File("./temp." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
+            boolean firstSave = false;
             if (rs.next()) {
                 versionId = rs.getString(1);
                 File newestBackup = new File("./storage/" + v.details().videoId() + "/audio/"
                         + versionId + "." + findAudioVideoFormatByMimeType(v.findFormatByItag(itag).mimeType()));
                 audioChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                firstSave = true;
                 System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/audio/");
                 Path storage = Paths.get("./storage/" + v.details().videoId() + "/audio/");
                 Files.createDirectories(storage);
@@ -195,10 +201,12 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the audio!");
-                if (v.details().title().length() >= 20) {
-                    Main.sendMessage(con, "Audio of video \"" + v.details().title().substring(0, 20) + "\" changed!");
-                } else {
-                    Main.sendMessage(con, "Audio of video \"" + v.details().title() + "\" changed!");
+                if (!firstSave) {
+                    if (v.details().title().length() >= 20) {
+                        Main.sendMessage(con, "Audio of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                    } else {
+                        Main.sendMessage(con, "Audio of video \"" + v.details().title() + "\" changed!");
+                    }
                 }
             } else {
                 System.out.println("There were no audio changes detected!");
@@ -222,12 +230,14 @@ public class UpdateVideo {
             String versionId = "";
             File downloadedFile = new File("./temp.txt");
             FileUtils.writeStringToFile(downloadedFile, v.details().description(), "UTF-8");
+            boolean firstSave = false;
             if (rs.next()) {
                 versionId = rs.getString(1);
                 File newestBackup = new File("./storage/" + v.details().videoId() + "/description/"
                         + versionId + ".txt");
                 descriptionChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                firstSave = true;
                 System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/description/");
                 Path storage = Paths.get("./storage/" + v.details().videoId() + "/description/");
                 Files.createDirectories(storage);
@@ -257,10 +267,12 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the description!");
-                if (v.details().title().length() >= 20) {
-                    Main.sendMessage(con, "Description of video \"" + v.details().title().substring(0, 20) + "\" changed!");
-                } else {
-                    Main.sendMessage(con, "Description of video \"" + v.details().title() + "\" changed!");
+                if (!firstSave) {
+                    if (v.details().title().length() >= 20) {
+                        Main.sendMessage(con, "Description of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                    } else {
+                        Main.sendMessage(con, "Description of video \"" + v.details().title() + "\" changed!");
+                    }
                 }
             } else {
                 System.out.println("There were no description changes detected!");
@@ -283,12 +295,14 @@ public class UpdateVideo {
             ResultSet rs = ps.executeQuery();
             boolean thumbnailChanged;
             String versionId = "";
+            boolean firstSave = false;
             if (rs.next()) {
                 versionId = rs.getString(1);
                 File newestBackup = new File("./storage/" + v.details().videoId() + "/thumbnail/"
                         + versionId + ".webp");
                 thumbnailChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                firstSave = true;
                 System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/thumbnail/");
                 Path storage = Paths.get("./storage/" + v.details().videoId() + "/thumbnail/");
                 Files.createDirectories(storage);
@@ -318,10 +332,12 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the thumbnail!");
-                if (v.details().title().length() >= 20) {
-                    Main.sendMessage(con, "Thumbnail of video \"" + v.details().title().substring(0, 20) + "\" changed!");
-                } else {
-                    Main.sendMessage(con, "Thumbnail of video \"" + v.details().title() + "\" changed!");
+                if (!firstSave) {
+                    if (v.details().title().length() >= 20) {
+                        Main.sendMessage(con, "Thumbnail of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                    } else {
+                        Main.sendMessage(con, "Thumbnail of video \"" + v.details().title() + "\" changed!");
+                    }
                 }
             } else {
                 System.out.println("There were no thumbnail changes detected!");
@@ -343,12 +359,14 @@ public class UpdateVideo {
             String versionId = "";
             File downloadedFile = new File("./temp.txt");
             FileUtils.writeStringToFile(downloadedFile, v.details().title(), "UTF-8");
+            boolean firstSave = false;
             if (rs.next()) {
                 versionId = rs.getString(1);
                 File newestBackup = new File("./storage/" + v.details().videoId() + "/title/"
                         + versionId + ".txt");
                 titleChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                firstSave = true;
                 System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/title/");
                 Path storage = Paths.get("./storage/" + v.details().videoId() + "/title/");
                 Files.createDirectories(storage);
@@ -378,10 +396,12 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the title!");
-                if (v.details().title().length() >= 20) {
-                    Main.sendMessage(con, "Title of video \"" + v.details().title().substring(0, 20) + "\" changed!");
-                } else {
-                    Main.sendMessage(con, "Title of video \"" + v.details().title() + "\" changed!");
+                if (!firstSave) {
+                    if (v.details().title().length() >= 20) {
+                        Main.sendMessage(con, "Title of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                    } else {
+                        Main.sendMessage(con, "Title of video \"" + v.details().title() + "\" changed!");
+                    }
                 }
             } else {
                 System.out.println("There were no title changes detected!");
@@ -408,12 +428,14 @@ public class UpdateVideo {
                 tags.append(keyword).append(",");
             }
             FileUtils.writeStringToFile(downloadedFile, tags.toString(), "UTF-8");
+            boolean firstSave = false;
             if (rs.next()) {
                 versionId = rs.getString(1);
                 File newestBackup = new File("./storage/" + v.details().videoId() + "/tags/"
                         + versionId + ".txt");
                 tagsChanged = !FileUtils.contentEquals(newestBackup, downloadedFile);
             } else {
+                firstSave = true;
                 System.out.println("Creating directories: ./storage/" + v.details().videoId() + "/tags/");
                 Path storage = Paths.get("./storage/" + v.details().videoId() + "/tags/");
                 Files.createDirectories(storage);
@@ -443,10 +465,12 @@ public class UpdateVideo {
                     throw new FileDownloadFailedException();
                 }
                 System.out.println("Successfully archived the tags!");
-                if (v.details().title().length() >= 20) {
-                    Main.sendMessage(con, "Tags of video \"" + v.details().title().substring(0, 20) + "\" changed!");
-                } else {
-                    Main.sendMessage(con, "Tags of video \"" + v.details().title() + "\" changed!");
+                if (!firstSave) {
+                    if (v.details().title().length() >= 20) {
+                        Main.sendMessage(con, "Tags of video \"" + v.details().title().substring(0, 20) + "\" changed!");
+                    } else {
+                        Main.sendMessage(con, "Tags of video \"" + v.details().title() + "\" changed!");
+                    }
                 }
             } else {
                 System.out.println("There were no tag changes detected!");
