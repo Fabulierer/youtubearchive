@@ -492,7 +492,7 @@ public class UpdateVideo {
         return itag;
     }
 
-    private static String findAudioVideoFormatByMimeType(String mimeType) throws VideoCodecNotFoundException {
+    public static String findAudioVideoFormatByMimeType(String mimeType) throws VideoCodecNotFoundException {
         if (mimeType.equals("audio/mp4; codecs=\"mp4a.40.2\"")) return "m4a";
         if (mimeType.contains("m4a")) return "m4a";
         if (mimeType.contains("webm")) return "webm";

@@ -13,6 +13,8 @@ import java.util.Scanner;
 
 public class Main {
 
+    public static int drive;
+
     public static void main(String[] arguments) throws IOException, DatabaseConnectionFailedException {
         File[] computerDrives = File.listRoots();
         File settings = new File("./settings.txt");
@@ -36,7 +38,7 @@ public class Main {
                 String url = settingsScanner.nextLine().split(" ")[1];
                 String user = settingsScanner.nextLine().split(" ")[1];
                 String password = settingsScanner.nextLine().split(" ")[1];
-                int drive = Integer.parseInt(settingsScanner.nextLine().split(" ")[1]);
+                drive = Integer.parseInt(settingsScanner.nextLine().split(" ")[1]);
 
                 System.out.println("Settings successfully loaded!");
                 System.out.println("Trying to connect to database...");
@@ -141,7 +143,7 @@ public class Main {
                         case "clearmessages":
                         case "cm":
                             con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
-                            System.out.println("Unread messages have been removed!");
+                            System.out.println("Read messages have been removed!");
                             break;
                         case "remove":
                         case "r":
@@ -200,6 +202,10 @@ public class Main {
                                 System.out.println("In order to complete a wipe, you must create a file called wipe.");
                             }
                             break;
+                        case "startserver":
+                        case "ss":
+                            Server.startServer(con);
+                            break;
                         case "help":
                         case "h":
                             System.out.println("Help:\n" +
@@ -227,7 +233,7 @@ public class Main {
                     }
                 }
                 if (UpdateVideo.t != null) UpdateVideo.t.cancel();
-            } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException e) {
+            } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException | VideoCodecNotFoundException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
