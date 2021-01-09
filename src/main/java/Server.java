@@ -89,7 +89,7 @@ public class Server {
                         ResultSet rs = con.prepareStatement("SELECT Time, Message, MessageRead FROM messages ORDER BY Time DESC").executeQuery();
                         StringBuilder answer = new StringBuilder("+messages;/");
                         while (rs.next()) {
-                            for (int i = 1; i <= 9; i++) {
+                            for (int i = 1; i <= 3; i++) {
                                 answer.append(rs.getString(i)).append(";");
                             }
                             answer.append("/");
