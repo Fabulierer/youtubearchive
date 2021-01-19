@@ -131,20 +131,14 @@ public class Server {
                                     AddVideo.addPlaylist(args[2], con);
                                 }
                             }
-                            output.writeUTF("+add");
+                            output.writeUTF("+add;/" + args[2]);
                         } catch (YoutubeException | VideoCodecNotFoundException | SQLException | IOException e) {
                             e.printStackTrace();
                             try {
-                                output.writeUTF("-add;/" + e.toString());
+                                output.writeUTF("-add;/" + args[2] + ";/" + e.toString());
                             } catch (IOException ioException) {
                                 ioException.printStackTrace();
                             }
-                        }
-                    } else {
-                        try {
-                            output.writeUTF("-add;/Not enough parameters!");
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
                     }
                     break;
