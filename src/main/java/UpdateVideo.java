@@ -6,6 +6,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -75,6 +77,76 @@ public class UpdateVideo {
         } catch (VideoNotInDatabaseException | SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void checkFile(String format, String extension, String videoId, Connection con, Method downloadFile, boolean message)
+            throws IOException, FileDownloadFailedException, SQLException, InvocationTargetException, IllegalAccessException {
+        // Download the new File (just by using the given Method)
+        File newFile = (File) downloadFile.invoke(null);
+
+        // Get the newest VersionID
+        // All in all, the statement selects from the table of the given format from the VersionIDs the newest VersionID.
+        //noinspection SqlResolve Disable inspection here because table will have "Time" column 100%
+        PreparedStatement ps = con.prepareStatement("SELECT (?) FROM (?) WHERE (?) = (?) ORDER BY `Time` DESC");
+        ps.setString(1, format + "VersionID");
+        ps.setString(2, format.toLowerCase() + "list");
+        ps.setString(3, format + "ID");
+        ps.setString(4, videoId);
+
+        // Get information out of Result
+        ResultSet rs = ps.executeQuery();
+        boolean firstSave = !rs.next(); // If this is the first download, there will be no entry in the result set
+        boolean archiveFile = false;
+        if (!firstSave) {
+            // If this is not the first download, this part will check if the two files (newest archived file and
+            // new download) are identical
+
+            // Get newest archived File
+            File newestArchive = new File("./storage/" + videoId + "/" + format.toLowerCase() + "/"
+                    + rs.getString(1) + "." + extension);
+
+            // Check if files are identical, if no, archiveFile = true
+            archiveFile = !FileUtils.contentEquals(newFile, newestArchive);
+        }
+
+        if (firstSave || archiveFile) {
+            // Save new version
+
+            // Add new entry in database
+            //noinspection SqlResolve
+            ps = con.prepareStatement("INSERT INTO archived" + format.toLowerCase() + " VALUES(" +
+                    "NULL," +
+                    "(?)," +
+                    "(?))");
+            ps.setString(1, videoId);
+            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            ps.execute();
+
+            // Get the VersionID for the new entry
+            //noinspection SqlResolve
+            ps = con.prepareStatement("SELECT (?) FROM (?) WHERE (?) = (?) ORDER BY `Time` DESC");
+            ps.setString(1, format + "VersionID");
+            ps.setString(2, format.toLowerCase() + "list");
+            ps.setString(3, format + "ID");
+            ps.setString(4, videoId);
+            rs = ps.executeQuery();
+            rs.next();
+            int versionId = rs.getInt(1);
+
+            // Archive the file
+            File copyTarget = new File("./storage/" + videoId + "/" + format.toLowerCase() + "/" +
+                    versionId + "." + extension);
+            if (!newFile.renameTo(copyTarget)) {
+                throw new FileDownloadFailedException();
+            }
+
+            if (message) {
+                Main.sendMessage(con, "+change;" + videoId + ";" + format + ";" + firstSave);
+            }
+        }
+        // Delete temp file
+        //noinspection ResultOfMethodCallIgnored
+        newFile.delete();
     }
 
     private static void checkVideoFile(Connection con, YoutubeVideo v) throws VideoNotInDatabaseException {
