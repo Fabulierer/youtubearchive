@@ -189,7 +189,7 @@ public class Server {
                                 UpdateVideo.checkVideo(args[1], con);
                                 output.writeUTF("+update;/1");
                             }
-                        } catch (SQLException | IOException e) {
+                        } catch (SQLException | IOException | VideoCodecNotFoundException e) {
                             e.printStackTrace();
                             try {
                                 output.writeUTF("-update;/" + e.toString());
