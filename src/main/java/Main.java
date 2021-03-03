@@ -12,7 +12,6 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class Main {
-    //test
 
     public static int drive;
 
