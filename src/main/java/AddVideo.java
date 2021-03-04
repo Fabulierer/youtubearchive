@@ -18,7 +18,7 @@ public class AddVideo {
         for (PlaylistVideoDetails playlistVideoDetails : pl) {
             try {
                 addVideo(playlistVideoDetails.videoId(), con);
-            } catch (SQLException | VideoCodecNotFoundException e) {
+            } catch (SQLException | VideoCodecNotFoundException | YoutubeException e) {
                 e.printStackTrace();
             }
         }
