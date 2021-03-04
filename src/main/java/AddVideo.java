@@ -12,11 +12,15 @@ import java.util.List;
 
 public class AddVideo {
 
-    public static void addPlaylist(String id, Connection con) throws YoutubeException, VideoCodecNotFoundException, SQLException {
+    public static void addPlaylist(String id, Connection con) throws YoutubeException {
         YoutubeDownloader downloader = new YoutubeDownloader();
         List<PlaylistVideoDetails> pl = downloader.getPlaylist(id).videos();
         for (PlaylistVideoDetails playlistVideoDetails : pl) {
-            addVideo(playlistVideoDetails.videoId(), con);
+            try {
+                addVideo(playlistVideoDetails.videoId(), con);
+            } catch (SQLException | VideoCodecNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 

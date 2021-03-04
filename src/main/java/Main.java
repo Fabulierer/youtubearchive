@@ -2,6 +2,7 @@ import com.github.kiulian.downloader.YoutubeException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -15,7 +16,7 @@ public class Main {
 
     public static int drive;
 
-    public static void main(String[] arguments) throws IOException, DatabaseConnectionFailedException {
+    public static void main(String[] arguments) throws DatabaseConnectionFailedException, IOException {
         File[] computerDrives = File.listRoots();
         File settings = new File("./settings.txt");
         if (settings.createNewFile()) {
@@ -235,7 +236,7 @@ public class Main {
                     }
                 }
                 if (UpdateVideo.t != null) UpdateVideo.t.cancel();
-            } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException | VideoCodecNotFoundException e) {
+            } catch (IndexOutOfBoundsException | TableCreationFailedException | YoutubeException | VideoCodecNotFoundException | IOException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
