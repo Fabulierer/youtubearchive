@@ -61,15 +61,15 @@ public class UpdateVideo {
             System.out.println("Checking Video with Video ID: " + videoId);
             YoutubeDownloader d = new YoutubeDownloader();
             YoutubeVideo v = d.getVideo(videoId);
-            PreparedStatement ps = con.prepareStatement("SELECT VideoItag, AudioItag FROM videolist WHERE VideoID = (?)");
+            PreparedStatement ps = con.prepareStatement("SELECT VideoItag, AudioItag, LowVideoAudioItag FROM videolist WHERE VideoID = (?)");
             ps.setString(1, videoId);
             ResultSet rs = ps.executeQuery();
             rs.next();
 
-            // Video download block
-            int itagVideo = rs.getInt(1);
-            String extensionVideo = findAudioVideoFormatByMimeType(v.findFormatByItag(rs.getInt(2)).mimeType());
-            checkFile("Video", extensionVideo, videoId, con, new DownloadFormat() {
+            // LowVideoAudio download block
+            int itagLowVideoAudio = rs.getInt(3);
+            String extensionLowVideoAudio = findAudioVideoFormatByMimeType(v.findFormatByItag(itagLowVideoAudio).mimeType());
+            checkFile("LowVideoAudio", extensionLowVideoAudio, videoId, con, new DownloadFormat() {
                 @Override
                 public File downloadFile(String videoId, int itag) throws IOException, YoutubeException {
                     return downloadYoutubeFile(videoId, itag);
@@ -77,24 +77,41 @@ public class UpdateVideo {
             }, new onFileUpdate() {
                 @Override
                 public void message(String format, String videoId) {
-                    Main.sendMessage(con, "+change;" + videoId + ";" + format);
-                }
-            }, itagVideo);
+                    try {
+                        // Video download block
+                        int itagVideo = rs.getInt(1);
+                        String extensionVideo = findAudioVideoFormatByMimeType(v.findFormatByItag(itagVideo).mimeType());
+                        checkFile("Video", extensionVideo, videoId, con, new DownloadFormat() {
+                            @Override
+                            public File downloadFile(String videoId, int itag) throws IOException, YoutubeException {
+                                return downloadYoutubeFile(videoId, itag);
+                            }
+                        }, new onFileUpdate() {
+                            @Override
+                            public void message(String format, String videoId) {
+                                Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                            }
+                        }, itagVideo);
 
-            // Audio download block
-            int itagAudio = rs.getInt(2);
-            String extensionAudio = findAudioVideoFormatByMimeType(v.findFormatByItag(rs.getInt(2)).mimeType());
-            checkFile("Audio", extensionAudio, videoId, con, new DownloadFormat() {
-                @Override
-                public File downloadFile(String videoId, int itag) throws IOException, YoutubeException {
-                    return downloadYoutubeFile(videoId, itag);
+                        // Audio download block
+                        int itagAudio = rs.getInt(2);
+                        String extensionAudio = findAudioVideoFormatByMimeType(v.findFormatByItag(itagAudio).mimeType());
+                        checkFile("Audio", extensionAudio, videoId, con, new DownloadFormat() {
+                            @Override
+                            public File downloadFile(String videoId, int itag) throws IOException, YoutubeException {
+                                return downloadYoutubeFile(videoId, itag);
+                            }
+                        }, new onFileUpdate() {
+                            @Override
+                            public void message(String format, String videoId) {
+                                Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                            }
+                        }, itagAudio);
+                    } catch (IOException | SQLException | InvocationTargetException | IllegalAccessException | YoutubeException | VideoCodecNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }, new onFileUpdate() {
-                @Override
-                public void message(String format, String videoId) {
-                    Main.sendMessage(con, "+change;" + videoId + ";" + format);
-                }
-            }, itagAudio);
+            }, itagLowVideoAudio);
 
             // Description download block
             checkFile("Description", "txt", videoId, con, new DownloadFormat() {
@@ -238,7 +255,6 @@ public class UpdateVideo {
 
             // Create folders if not already done so
             Path storage = Paths.get("./storage/" + videoId + "/" + format.toLowerCase());
-            System.out.println(storage.getFileName().toString());
             Files.createDirectories(storage);
         }
         if (firstSave || archiveFile) {

@@ -48,6 +48,7 @@ public class Main {
                 System.out.println("Successfully connected to database!");
 
                 checkTable("videolist", con);
+                checkTable("archivedlowvideoaudio", con);
                 checkTable("archivedvideo", con);
                 checkTable("archivedaudio", con);
                 checkTable("archiveddescription", con);
@@ -55,6 +56,7 @@ public class Main {
                 checkTable("archivedtitle", con);
                 checkTable("archivedtags", con);
                 checkTable("messages", con);
+                updateTables(con);
 
                 System.out.println("Checking if 'storage' directory exists...");
                 Path storage = Paths.get("./storage/");
@@ -191,7 +193,7 @@ public class Main {
                         case "w":
                             if (new File("wipe").exists()) {
                                 con.prepareStatement("DROP TABLE " +
-                                        "archivedaudio, archiveddescription, archivedthumbnail, archivedtitle," +
+                                        "archivedlowvideoaudio, archivedaudio, archiveddescription, archivedthumbnail, archivedtitle," +
                                         "archivedvideo, messages, videolist").execute();
                                 System.out.println("Database has been wiped!");
                                 FileUtils.deleteDirectory(new File("storage"));
@@ -242,10 +244,32 @@ public class Main {
         }
     }
 
+    private static void updateTables(Connection con) throws SQLException {
+        // adds "lowVideoAudioItag" to videolist
+        try {
+            con.prepareStatement("SELECT LowVideoAudioItag FROM videolist").execute();
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("Updated the 'videolist' table: added 'lowVideoAudioItag'");
+            con.prepareStatement("ALTER TABLE videolist ADD LowVideoAudioItag int").execute();
+            ResultSet rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
+            while (rs.next()) {
+                String videoId = rs.getString(1);
+                PreparedStatement ps = con.prepareStatement("DELETE FROM videolist WHERE VideoID = (?)");
+                ps.setString(1, videoId);
+                ps.execute();
+                try {
+                    AddVideo.addVideo(videoId, con);
+                } catch (VideoCodecNotFoundException | YoutubeException videoCodecNotFoundException) {
+                    videoCodecNotFoundException.printStackTrace();
+                }
+            }
+        }
+    }
+
     private static void checkTable(String tableName, Connection con) throws SQLException, TableCreationFailedException {
         System.out.println("Checking if table " + tableName + " exists...");
         try {
-            con.prepareStatement("SELECT * FROM " + tableName).executeQuery();
+            con.prepareStatement("SELECT * FROM " + tableName).execute();
             System.out.println("Found the " + tableName + " Table.");
         } catch (SQLSyntaxErrorException e) {
             System.out.println("Couldn't find table '" + tableName + "'. Creating a new one...");
@@ -257,7 +281,15 @@ public class Main {
                             "ChannelName varchar(255)," +
                             "LastChecked TIMESTAMP," +
                             "VideoItag int," +
-                            "AudioItag int)").execute();
+                            "AudioItag int," +
+                            "LowVideoAudioItag int)").execute();
+                    break;
+                case "archivedlowvideoaudio":
+                    con.prepareStatement("CREATE TABLE archivedlowvideoaudio(" +
+                            "LowVideoAudioVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time TIMESTAMP," +
+                            "PRIMARY KEY (LowVideoAudioVersionID))").execute();
                     break;
                 case "archivedvideo":
                     con.prepareStatement("CREATE TABLE archivedvideo(" +
