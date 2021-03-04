@@ -17,10 +17,12 @@ public class BestFormat {
 
         VideoQuality bestVideoQuality = VideoQuality.noVideo;
         AudioQuality bestAudioQuality = AudioQuality.noAudio;
+        VideoQuality worstVideoQuality = VideoQuality.hd2880p;
         int videoQualityRating = 0;
 
         Format bestVideo = null;
         Format bestAudio = null;
+        Format worstVideoAudio = null;
 
         for (AudioVideoFormat audioVideoFormat : audioVideo) {
             if (bestVideo == null) {
@@ -44,6 +46,11 @@ public class BestFormat {
             } else if (audioVideoFormat.audioQuality().compareTo(bestAudioQuality) < 0) {
                 bestAudio = audioVideoFormat;
                 bestAudioQuality = audioVideoFormat.audioQuality();
+            }
+
+            if (audioVideoFormat.videoQuality().compareTo(worstVideoQuality) > 0) {
+                worstVideoAudio = audioVideoFormat;
+                worstVideoQuality = audioVideoFormat.videoQuality();
             }
         }
 
@@ -76,7 +83,8 @@ public class BestFormat {
 
         assert bestVideo != null;
         assert bestAudio != null;
-        return new Integer[]{bestVideo.itag().id(), bestAudio.itag().id()};
+        assert worstVideoAudio != null;
+        return new Integer[]{bestVideo.itag().id(), bestAudio.itag().id(), worstVideoAudio.itag().id()};
     }
 
     private static int rateVideoQuality(AudioVideoFormat v) throws VideoCodecNotFoundException {

@@ -33,6 +33,7 @@ public class AddVideo {
                     "(?)," +
                     "(?)," +
                     "(?)," +
+                    "(?)," +
                     "(?))");
             ps.setString(1, id);
             ps.setString(2, details.title());
@@ -40,6 +41,7 @@ public class AddVideo {
             ps.setTimestamp(4, new Timestamp(1000));
             ps.setInt(5, formats[0]);
             ps.setInt(6, formats[1]);
+            ps.setInt(7, formats[2]);
             ps.execute();
             if (con.prepareStatement("SELECT VideoID FROM videolist WHERE VideoID = '" + id + "'").executeQuery().next()) {
                 System.out.println("Successfully added the video!");
