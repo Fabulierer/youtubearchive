@@ -57,6 +57,7 @@ public class Main {
                 checkTable("archivedtitle", con);
                 checkTable("archivedtags", con);
                 checkTable("messages", con);
+                checkTable("playlists", con);
                 updateTables(con);
 
                 System.out.println("Checking if 'storage' directory exists...");
@@ -94,6 +95,14 @@ public class Main {
                         case "ap":
                             if (args.length > 1) {
                                 AddVideo.addPlaylist(args[1], con);
+                            } else {
+                                System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                            }
+                            break;
+                        case "addchannel":
+                        case "ac":
+                            if (args.length > 1) {
+                                AddVideo.addChannel(args[1], con);
                             } else {
                                 System.out.println("You need to use at least 1 Parameter! Use h for more information!");
                             }
@@ -213,7 +222,8 @@ public class Main {
                         case "h":
                             System.out.println("Help:\n" +
                                     "addvideo/av (videoId) | adds a video to the list.\n" +
-                                    "addplaylist/ap (playlistID) | adds every video from a playlist to the list\n" +
+                                    "addplaylist/ap (playlistID) | adds playlist\n" +
+                                    "addchannel/ac (channelId) | adds the channel uploads playlist to the playlist list\n" +
                                     "update/u <videoId> | manually update a video\n" +
                                     "updateall/ua | manually update every video\n" +
                                     "scheduleupdate/su | schedule an update for every video\n" +
@@ -337,10 +347,16 @@ public class Main {
                 case "messages":
                     con.prepareStatement("CREATE TABLE messages(" +
                             "MessageId int NOT NULL AUTO_INCREMENT," +
-                            "Message varchar(511)," +
+                            "Message varchar(255)," +
                             "MessageRead BOOLEAN," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (MessageId))").execute();
+                    break;
+                case "playlists":
+                    con.prepareStatement("CREATE TABLE playlists(" +
+                            "PlaylistId int NOT NULL AUTO_INCREMENT," +
+                            "Playlist varchar(255)," +
+                            "PRIMARY KEY (PlaylistId))").execute();
                     break;
                 default:
                     throw new TableCreationFailedException();

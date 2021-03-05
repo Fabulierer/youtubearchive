@@ -2,6 +2,7 @@ import com.github.kiulian.downloader.YoutubeDownloader;
 import com.github.kiulian.downloader.YoutubeException;
 import com.github.kiulian.downloader.model.YoutubeVideo;
 import com.github.kiulian.downloader.model.formats.Format;
+import com.github.kiulian.downloader.model.playlist.PlaylistVideoDetails;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -36,7 +37,28 @@ public class UpdateVideo {
 
     public static void checkAll(Connection con) {
         try {
-            ResultSet rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
+            // Update videolist (add playlists)
+            ResultSet rs = con.prepareStatement("SELECT PlaylistId FROM playlists").executeQuery();
+            YoutubeDownloader downloader = new YoutubeDownloader();
+            while (rs.next()) {
+                try {
+                    List<PlaylistVideoDetails> pl = downloader.getPlaylist(rs.getString(1)).videos();
+                    for (PlaylistVideoDetails playlistVideoDetails : pl) {
+                        try {
+                            String videoId = playlistVideoDetails.videoId();
+                            if (downloader.getVideo(videoId).details().viewCount() > 10000) {
+                                AddVideo.addVideo(videoId, con);
+                            }
+                        } catch (SQLException | VideoCodecNotFoundException | YoutubeException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (YoutubeException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
             System.out.println("Checking every video.");
             int elements = 0;
             while (rs.next()) {
