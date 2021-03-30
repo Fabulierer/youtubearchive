@@ -38,7 +38,7 @@ public class UpdateVideo {
     public static void checkAll(Connection con) {
         try {
             // Update videolist (add playlists)
-            ResultSet rs = con.prepareStatement("SELECT PlaylistId FROM playlists").executeQuery();
+            ResultSet rs = con.prepareStatement("SELECT Playlist FROM playlists").executeQuery();
             YoutubeDownloader downloader = new YoutubeDownloader();
             while (rs.next()) {
                 try {
