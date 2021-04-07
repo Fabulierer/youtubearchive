@@ -125,10 +125,10 @@ public class Server {
                         try {
                             switch (args[1]) {
                                 case "v": {
-                                    AddVideo.addVideo(args[2], con);
+                                    AddVideo.addVideo(args[2],  con);
                                 }
                                 case "p": {
-                                    AddVideo.addPlaylist(args[2], con);
+                                    AddVideo.addPlaylist(args[2],0,  con);
                                 }
                             }
                             output.writeUTF("+add;/" + args[2]);

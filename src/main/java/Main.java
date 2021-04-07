@@ -2,7 +2,6 @@ import com.github.kiulian.downloader.YoutubeException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -88,23 +87,23 @@ public class Main {
                             if (args.length > 1) {
                                 AddVideo.addVideo(args[1], con);
                             } else {
-                                System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                                System.out.println("You need to use at least 1 parameter! Use h for more information!");
                             }
                             break;
                         case "addplaylist":
                         case "ap":
                             if (args.length > 1) {
-                                AddVideo.addPlaylist(args[1], con);
+                                AddVideo.addPlaylist(args[1], Integer.parseInt(args[2]), con);
                             } else {
-                                System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                                System.out.println("You need to use 2 parameters! Use h for more information!");
                             }
                             break;
                         case "addchannel":
                         case "ac":
                             if (args.length > 1) {
-                                AddVideo.addChannel(args[1], con);
+                                AddVideo.addChannel(args[1], Integer.parseInt(args[2]), con);
                             } else {
-                                System.out.println("You need to use at least 1 Parameter! Use h for more information!");
+                                System.out.println("You need to use 2 parameters! Use h for more information!");
                             }
                             break;
                         case "update":
@@ -222,8 +221,8 @@ public class Main {
                         case "h":
                             System.out.println("Help:\n" +
                                     "addvideo/av (videoId) | adds a video to the list.\n" +
-                                    "addplaylist/ap (playlistID) | adds playlist\n" +
-                                    "addchannel/ac (channelId) | adds the channel uploads playlist to the playlist list\n" +
+                                    "addplaylist/ap (playlistID) (minViews) | adds playlist\n" +
+                                    "addchannel/ac (channelId) (minViews) | adds the channel uploads playlist to the playlist list\n" +
                                     "update/u <videoId> | manually update a video\n" +
                                     "updateall/ua | manually update every video\n" +
                                     "scheduleupdate/su | schedule an update for every video\n" +
@@ -271,6 +270,24 @@ public class Main {
                 try {
                     AddVideo.addVideo(videoId, con);
                 } catch (VideoCodecNotFoundException | YoutubeException videoCodecNotFoundException) {
+                    videoCodecNotFoundException.printStackTrace();
+                }
+            }
+        }
+        try {
+            con.prepareStatement("SELECT Views FROM playlists").execute();
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("Updated the 'playlist' table: added 'Views'");
+            con.prepareStatement("ALTER TABLE playlists ADD Views int").execute();
+            ResultSet rs = con.prepareStatement("SELECT Playlist FROM playlists").executeQuery();
+            while (rs.next()) {
+                String playlist = rs.getString(1);
+                PreparedStatement ps = con.prepareStatement("DELETE FROM playlists WHERE Playlist = (?)");
+                ps.setString(1, playlist);
+                ps.execute();
+                try {
+                    AddVideo.addPlaylist(playlist,0, con);
+                } catch (YoutubeException videoCodecNotFoundException) {
                     videoCodecNotFoundException.printStackTrace();
                 }
             }
@@ -356,6 +373,7 @@ public class Main {
                     con.prepareStatement("CREATE TABLE playlists(" +
                             "PlaylistId int NOT NULL AUTO_INCREMENT," +
                             "Playlist varchar(255)," +
+                            "Views int," +
                             "PRIMARY KEY (PlaylistId))").execute();
                     break;
                 default:

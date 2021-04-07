@@ -38,7 +38,7 @@ public class UpdateVideo {
     public static void checkAll(Connection con) {
         try {
             // Update videolist (add playlists)
-            ResultSet rs = con.prepareStatement("SELECT Playlist FROM playlists").executeQuery();
+            ResultSet rs = con.prepareStatement("SELECT Playlist, Views FROM playlists").executeQuery();
             YoutubeDownloader downloader = new YoutubeDownloader();
             while (rs.next()) {
                 try {
@@ -46,7 +46,7 @@ public class UpdateVideo {
                     for (PlaylistVideoDetails playlistVideoDetails : pl) {
                         try {
                             String videoId = playlistVideoDetails.videoId();
-                            if (downloader.getVideo(videoId).details().viewCount() > 10000) {
+                            if (downloader.getVideo(videoId).details().viewCount() > rs.getInt(2)) {
                                 AddVideo.addVideo(videoId, con);
                             }
                         } catch (SQLException | VideoCodecNotFoundException | YoutubeException e) {

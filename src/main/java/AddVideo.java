@@ -12,15 +12,16 @@ import java.util.List;
 
 public class AddVideo {
 
-    public static void addPlaylist(String id, Connection con) throws YoutubeException, SQLException {
+    public static void addPlaylist(String id, int minViews, Connection con) throws YoutubeException, SQLException {
         System.out.println("Adding to playlist table");
-        PreparedStatement ps = con.prepareStatement("INSERT INTO playlists VALUES (NULL, (?))");
+        PreparedStatement ps = con.prepareStatement("INSERT INTO playlists VALUES (NULL, (?), (?))");
         ps.setString(1, id);
+        ps.setInt(2, minViews);
         ps.execute();
     }
 
-    public static void addChannel(String id, Connection con) throws YoutubeException, SQLException {
-        addPlaylist(new YoutubeDownloader().getChannelUploads(id).details().playlistId(), con);
+    public static void addChannel(String id, int minViews, Connection con) throws YoutubeException, SQLException {
+        addPlaylist(new YoutubeDownloader().getChannelUploads(id).details().playlistId(), minViews, con);
     }
 
     public static void addVideo(String id, Connection con) throws SQLException, VideoCodecNotFoundException, YoutubeException {

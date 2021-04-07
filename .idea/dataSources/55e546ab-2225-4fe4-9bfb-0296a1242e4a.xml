@@ -1,8 +1,166 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="MySQL - test@localhost">
-  <database-model serializer="dbm" dbms="MARIADB" family-id="MARIADB" format-version="4.20">
+  <database-model serializer="dbm" dbms="MARIADB" family-id="MARIADB" format-version="4.21">
     <root id="1">
       <ServerVersion>10.4.17</ServerVersion>
+      <Grants>|root||root|127.0.0.1|ALTER|G
+|root||root|::1|ALTER|G
+|root||root|localhost|ALTER|G
+|root||youtubearchive|localhost|ALTER|G
+|root||root|127.0.0.1|ALTER ROUTINE|G
+|root||root|::1|ALTER ROUTINE|G
+|root||root|localhost|ALTER ROUTINE|G
+|root||youtubearchive|localhost|ALTER ROUTINE|G
+|root||root|127.0.0.1|CREATE|G
+|root||root|::1|CREATE|G
+|root||root|localhost|CREATE|G
+|root||youtubearchive|localhost|CREATE|G
+|root||root|127.0.0.1|CREATE ROUTINE|G
+|root||root|::1|CREATE ROUTINE|G
+|root||root|localhost|CREATE ROUTINE|G
+|root||youtubearchive|localhost|CREATE ROUTINE|G
+|root||root|127.0.0.1|CREATE TABLESPACE|G
+|root||root|::1|CREATE TABLESPACE|G
+|root||root|localhost|CREATE TABLESPACE|G
+|root||youtubearchive|localhost|CREATE TABLESPACE|G
+|root||root|127.0.0.1|CREATE TEMPORARY TABLES|G
+|root||root|::1|CREATE TEMPORARY TABLES|G
+|root||root|localhost|CREATE TEMPORARY TABLES|G
+|root||youtubearchive|localhost|CREATE TEMPORARY TABLES|G
+|root||root|127.0.0.1|CREATE USER|G
+|root||root|::1|CREATE USER|G
+|root||root|localhost|CREATE USER|G
+|root||youtubearchive|localhost|CREATE USER|G
+|root||root|127.0.0.1|CREATE VIEW|G
+|root||root|::1|CREATE VIEW|G
+|root||root|localhost|CREATE VIEW|G
+|root||youtubearchive|localhost|CREATE VIEW|G
+|root||root|127.0.0.1|DELETE|G
+|root||root|::1|DELETE|G
+|root||root|localhost|DELETE|G
+|root||youtubearchive|localhost|DELETE|G
+|root||root|127.0.0.1|DELETE HISTORY|G
+|root||root|::1|DELETE HISTORY|G
+|root||root|localhost|DELETE HISTORY|G
+|root||youtubearchive|localhost|DELETE HISTORY|G
+|root||root|127.0.0.1|DROP|G
+|root||root|::1|DROP|G
+|root||root|localhost|DROP|G
+|root||youtubearchive|localhost|DROP|G
+|root||root|127.0.0.1|EVENT|G
+|root||root|::1|EVENT|G
+|root||root|localhost|EVENT|G
+|root||youtubearchive|localhost|EVENT|G
+|root||root|127.0.0.1|EXECUTE|G
+|root||root|::1|EXECUTE|G
+|root||root|localhost|EXECUTE|G
+|root||youtubearchive|localhost|EXECUTE|G
+|root||root|127.0.0.1|FILE|G
+|root||root|::1|FILE|G
+|root||root|localhost|FILE|G
+|root||youtubearchive|localhost|FILE|G
+|root||root|127.0.0.1|INDEX|G
+|root||root|::1|INDEX|G
+|root||root|localhost|INDEX|G
+|root||youtubearchive|localhost|INDEX|G
+|root||root|127.0.0.1|INSERT|G
+|root||root|::1|INSERT|G
+|root||root|localhost|INSERT|G
+|root||youtubearchive|localhost|INSERT|G
+|root||root|127.0.0.1|LOCK TABLES|G
+|root||root|::1|LOCK TABLES|G
+|root||root|localhost|LOCK TABLES|G
+|root||youtubearchive|localhost|LOCK TABLES|G
+|root||root|127.0.0.1|PROCESS|G
+|root||root|::1|PROCESS|G
+|root||root|localhost|PROCESS|G
+|root||youtubearchive|localhost|PROCESS|G
+|root||root|127.0.0.1|REFERENCES|G
+|root||root|::1|REFERENCES|G
+|root||root|localhost|REFERENCES|G
+|root||youtubearchive|localhost|REFERENCES|G
+|root||root|127.0.0.1|RELOAD|G
+|root||root|::1|RELOAD|G
+|root||root|localhost|RELOAD|G
+|root||youtubearchive|localhost|RELOAD|G
+|root||root|127.0.0.1|REPLICATION CLIENT|G
+|root||root|::1|REPLICATION CLIENT|G
+|root||root|localhost|REPLICATION CLIENT|G
+|root||youtubearchive|localhost|REPLICATION CLIENT|G
+|root||root|127.0.0.1|REPLICATION SLAVE|G
+|root||root|::1|REPLICATION SLAVE|G
+|root||root|localhost|REPLICATION SLAVE|G
+|root||youtubearchive|localhost|REPLICATION SLAVE|G
+|root||root|127.0.0.1|SELECT|G
+|root||root|::1|SELECT|G
+|root||root|localhost|SELECT|G
+|root||youtubearchive|localhost|SELECT|G
+|root||root|127.0.0.1|SHOW DATABASES|G
+|root||root|::1|SHOW DATABASES|G
+|root||root|localhost|SHOW DATABASES|G
+|root||youtubearchive|localhost|SHOW DATABASES|G
+|root||root|127.0.0.1|SHOW VIEW|G
+|root||root|::1|SHOW VIEW|G
+|root||root|localhost|SHOW VIEW|G
+|root||youtubearchive|localhost|SHOW VIEW|G
+|root||root|127.0.0.1|SHUTDOWN|G
+|root||root|::1|SHUTDOWN|G
+|root||root|localhost|SHUTDOWN|G
+|root||youtubearchive|localhost|SHUTDOWN|G
+|root||root|127.0.0.1|SUPER|G
+|root||root|::1|SUPER|G
+|root||root|localhost|SUPER|G
+|root||youtubearchive|localhost|SUPER|G
+|root||root|127.0.0.1|TRIGGER|G
+|root||root|::1|TRIGGER|G
+|root||root|localhost|TRIGGER|G
+|root||youtubearchive|localhost|TRIGGER|G
+|root||root|127.0.0.1|UPDATE|G
+|root||root|::1|UPDATE|G
+|root||root|localhost|UPDATE|G
+|root||youtubearchive|localhost|UPDATE|G
+|root||root|127.0.0.1|grant option|G
+|root||root|::1|grant option|G
+|root||root|localhost|grant option|G
+|root||youtubearchive|localhost|grant option|G
+phpmyadmin|schema||pma|localhost|DELETE|G
+phpmyadmin|schema||pma|localhost|INSERT|G
+phpmyadmin|schema||pma|localhost|SELECT|G
+phpmyadmin|schema||pma|localhost|UPDATE|G
+test|schema||&apos;&apos;||ALTER|G
+test|schema||&apos;&apos;||CREATE|G
+test|schema||&apos;&apos;||CREATE ROUTINE|G
+test|schema||&apos;&apos;||CREATE TEMPORARY TABLES|G
+test|schema||&apos;&apos;||CREATE VIEW|G
+test|schema||&apos;&apos;||DELETE|G
+test|schema||&apos;&apos;||DELETE HISTORY|G
+test|schema||&apos;&apos;||DROP|G
+test|schema||&apos;&apos;||EVENT|G
+test|schema||&apos;&apos;||INDEX|G
+test|schema||&apos;&apos;||INSERT|G
+test|schema||&apos;&apos;||LOCK TABLES|G
+test|schema||&apos;&apos;||REFERENCES|G
+test|schema||&apos;&apos;||SELECT|G
+test|schema||&apos;&apos;||SHOW VIEW|G
+test|schema||&apos;&apos;||TRIGGER|G
+test|schema||&apos;&apos;||UPDATE|G
+test\\_%|schema||&apos;&apos;||ALTER|G
+test\\_%|schema||&apos;&apos;||CREATE|G
+test\\_%|schema||&apos;&apos;||CREATE ROUTINE|G
+test\\_%|schema||&apos;&apos;||CREATE TEMPORARY TABLES|G
+test\\_%|schema||&apos;&apos;||CREATE VIEW|G
+test\\_%|schema||&apos;&apos;||DELETE|G
+test\\_%|schema||&apos;&apos;||DELETE HISTORY|G
+test\\_%|schema||&apos;&apos;||DROP|G
+test\\_%|schema||&apos;&apos;||EVENT|G
+test\\_%|schema||&apos;&apos;||INDEX|G
+test\\_%|schema||&apos;&apos;||INSERT|G
+test\\_%|schema||&apos;&apos;||LOCK TABLES|G
+test\\_%|schema||&apos;&apos;||REFERENCES|G
+test\\_%|schema||&apos;&apos;||SELECT|G
+test\\_%|schema||&apos;&apos;||SHOW VIEW|G
+test\\_%|schema||&apos;&apos;||TRIGGER|G
+test\\_%|schema||&apos;&apos;||UPDATE|G</Grants>
       <DefaultEngine>InnoDB</DefaultEngine>
       <DefaultCasing>lower/lower</DefaultCasing>
     </root>
@@ -1042,28 +1200,18 @@
     </collation>
     <user id="333" parent="1" name="pma">
       <Host>localhost</Host>
-      <ObjectGrants>SELECT,INSERT,UPDATE,DELETE|phpmyadmin
-</ObjectGrants>
     </user>
     <user id="334" parent="1" name="root">
       <Host>127.0.0.1</Host>
-      <ObjectGrants>ALL PRIVILEGES!
-</ObjectGrants>
     </user>
     <user id="335" parent="1" name="root">
       <Host>::1</Host>
-      <ObjectGrants>ALL PRIVILEGES!
-</ObjectGrants>
     </user>
     <user id="336" parent="1" name="root">
       <Host>localhost</Host>
-      <ObjectGrants>ALL PRIVILEGES!
-</ObjectGrants>
     </user>
     <user id="337" parent="1" name="youtubearchive">
       <Host>localhost</Host>
-      <ObjectGrants>ALL PRIVILEGES!
-</ObjectGrants>
     </user>
     <table id="338" parent="9" name="archivedaudio"/>
     <table id="339" parent="9" name="archiveddescription"/>
@@ -1237,7 +1385,7 @@
     </column>
     <column id="377" parent="345" name="Message">
       <Position>2</Position>
-      <DataType>varchar(511)|0s</DataType>
+      <DataType>varchar(255)|0s</DataType>
     </column>
     <column id="378" parent="345" name="MessageRead">
       <Position>3</Position>
@@ -1265,39 +1413,43 @@
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <key id="383" parent="346" name="PRIMARY">
+    <column id="383" parent="346" name="Views">
+      <Position>3</Position>
+      <DataType>int(11)|0s</DataType>
+    </column>
+    <key id="384" parent="346" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>PlaylistId</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="384" parent="347" name="VideoID">
+    <column id="385" parent="347" name="VideoID">
       <Position>1</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="385" parent="347" name="VideoTitle">
+    <column id="386" parent="347" name="VideoTitle">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="386" parent="347" name="ChannelName">
+    <column id="387" parent="347" name="ChannelName">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="387" parent="347" name="LastChecked">
+    <column id="388" parent="347" name="LastChecked">
       <Position>4</Position>
       <DataType>timestamp|0s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>current_timestamp()</DefaultExpression>
       <OnUpdate>current_timestamp()</OnUpdate>
     </column>
-    <column id="388" parent="347" name="VideoItag">
+    <column id="389" parent="347" name="VideoItag">
       <Position>5</Position>
       <DataType>int(11)|0s</DataType>
     </column>
-    <column id="389" parent="347" name="AudioItag">
+    <column id="390" parent="347" name="AudioItag">
       <Position>6</Position>
       <DataType>int(11)|0s</DataType>
     </column>
-    <column id="390" parent="347" name="lowVideoAudioItag">
+    <column id="391" parent="347" name="LowVideoAudioItag">
       <Position>7</Position>
       <DataType>int(11)|0s</DataType>
     </column>
