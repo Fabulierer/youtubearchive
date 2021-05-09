@@ -38,7 +38,8 @@ public class AddVideo {
                     "(?)," +
                     "(?)," +
                     "(?)," +
-                    "(?))");
+                    "(?), " +
+                    "1)");
             ps.setString(1, id);
             ps.setString(2, details.title());
             ps.setString(3, details.author());

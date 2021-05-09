@@ -1453,5 +1453,9 @@ test\\_%|schema||&apos;&apos;||UPDATE|G</Grants>
       <Position>7</Position>
       <DataType>int(11)|0s</DataType>
     </column>
+    <column id="392" parent="347" name="Active">
+      <Position>8</Position>
+      <DataType>tinyint(1)|0s</DataType>
+    </column>
   </database-model>
 </dataSource>

@@ -255,11 +255,11 @@ public class Main {
     }
 
     private static void updateTables(Connection con) throws SQLException {
-        // adds "lowVideoAudioItag" to videolist
+        // adds "lowVideoAudioItag" to videolist table
         try {
             con.prepareStatement("SELECT LowVideoAudioItag FROM videolist").execute();
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("Updated the 'videolist' table: added 'lowVideoAudioItag'");
+            System.out.println("Updating the 'videolist' table: adding 'lowVideoAudioItag'");
             con.prepareStatement("ALTER TABLE videolist ADD LowVideoAudioItag int").execute();
             ResultSet rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
             while (rs.next()) {
@@ -274,10 +274,11 @@ public class Main {
                 }
             }
         }
+        // adds "Views" to playlist table
         try {
             con.prepareStatement("SELECT Views FROM playlists").execute();
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("Updated the 'playlist' table: added 'Views'");
+            System.out.println("Updating the 'playlist' table: adding 'Views'");
             con.prepareStatement("ALTER TABLE playlists ADD Views int").execute();
             ResultSet rs = con.prepareStatement("SELECT Playlist FROM playlists").executeQuery();
             while (rs.next()) {
@@ -291,6 +292,13 @@ public class Main {
                     videoCodecNotFoundException.printStackTrace();
                 }
             }
+        }
+        try {
+            con.prepareStatement("SELECT Active FROM videolist").execute();
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("Updating the 'videolist' table: adding 'Active'");
+            con.prepareStatement("ALTER TABLE videolist ADD Active boolean").execute();
+            con.prepareStatement("UPDATE videolist SET Active = 1").execute();
         }
     }
 
@@ -324,6 +332,7 @@ public class Main {
                             "VideoVersionID int NOT NULL AUTO_INCREMENT," +
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
+                            "Active boolean," +
                             "PRIMARY KEY (VideoVersionID))").execute();
                     break;
                 case "archivedaudio":

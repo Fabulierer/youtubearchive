@@ -13,9 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class UpdateVideo {
 
@@ -38,40 +36,63 @@ public class UpdateVideo {
     public static void checkAll(Connection con) {
         try {
             // Update videolist (add playlists)
-            ResultSet rs = con.prepareStatement("SELECT Playlist, Views FROM playlists").executeQuery();
+            System.out.println("Updating videolist to include new videos found in playlists...");
+            ResultSet rs = con.prepareStatement("SELECT Playlist, Views, Count(*) FROM playlists").executeQuery();
             YoutubeDownloader downloader = new YoutubeDownloader();
-            while (rs.next()) {
+            for (int i = 0; rs.next(); i++) {
                 try {
                     List<PlaylistVideoDetails> pl = downloader.getPlaylist(rs.getString(1)).videos();
-                    for (PlaylistVideoDetails playlistVideoDetails : pl) {
+                    for (int j = 0; j < pl.size(); j++) {
+                        System.out.println("Playlist: [" + i + "/" + rs.getInt(3) + "] (" + (int) (i * 10000.0 / rs.getInt(3)) / 100.0 + "%)" +
+                                ", Video: [" + j + "/" + pl.size() + "] (" + (int) (j * 10000.0 / pl.size()) / 100.0 + "%)");
                         try {
-                            String videoId = playlistVideoDetails.videoId();
+                            String videoId = pl.get(j).videoId();
                             if (downloader.getVideo(videoId).details().viewCount() > rs.getInt(2)) {
                                 AddVideo.addVideo(videoId, con);
+                            } else {
+                                System.out.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
                             }
                         } catch (SQLException | VideoCodecNotFoundException | YoutubeException e) {
+                            System.out.println("Video with ID " + pl.get(j).videoId() + " is not available anymore.");
                             e.printStackTrace();
                         }
                     }
                 } catch (YoutubeException e) {
+                    System.out.println("Playlist with ID " + rs.getString(1) + " could not be found.");
                     e.printStackTrace();
                 }
             }
 
-            rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
+            rs = con.prepareStatement("SELECT VideoID, Active FROM videolist").executeQuery();
             System.out.println("Checking every video.");
             int elements = 0;
             while (rs.next()) {
                 elements++;
             }
             rs.beforeFirst();
+            ArrayList<String> brokenIds = new ArrayList<>();
             while (rs.next()) {
-                System.out.println("Checking Video " + rs.getRow() + "/" + elements);
-                try {
-                    checkVideo(rs.getString(1), con);
-                } catch (VideoCodecNotFoundException e) {
-                    e.printStackTrace();
+                if (rs.getInt(2) == 1) {
+                    System.out.println("Checking Video: [" + rs.getRow() + "/" + elements + "] (" + (int) (rs.getRow() * 10000.0 / elements) / 100.0 + "%)");
+                    try {
+                        checkVideo(rs.getString(1), con);
+                    } catch (VideoCodecNotFoundException e) {
+                        e.printStackTrace();
+                        brokenIds.add(rs.getString(1));
+                    }
+                } else System.out.println("Video skipped because it is not set active.");
+            }
+            System.out.println(brokenIds.size() + " videos could not be found. Want to disable them? (Y/N)");
+            Scanner scan = new Scanner(System.in);
+            if (scan.next().equals("Y")) {
+                for (int i = 0; i < brokenIds.size(); i++) {
+                    PreparedStatement ps = con.prepareStatement("UPDATE videolist SET Active = 0 WHERE VideoID = (?)");
+                    ps.setString(1, brokenIds.get(i));
                 }
+                System.out.println("Not available videos are disabled!");
+            }
+            else {
+                System.out.println("Changed nothing about the enabled status of videos.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
