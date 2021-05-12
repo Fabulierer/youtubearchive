@@ -77,7 +77,7 @@ public class Server {
                     } catch (SQLException | IOException e) {
                         e.printStackTrace();
                         try {
-                            output.writeUTF("-status;/" + e.toString());
+                            output.writeUTF("-status;/" + e);
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
                         }
@@ -113,7 +113,7 @@ public class Server {
                     } catch (SQLException | IOException e) {
                         e.printStackTrace();
                         try {
-                            output.writeUTF(e.toString());
+                            output.writeUTF("-clearmessages;/" + e);
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
                         }
@@ -121,21 +121,29 @@ public class Server {
                     break;
                 }
                 case "?add": {
-                    if (args.length == 3) {
+                    if (args.length >= 3) {
                         try {
                             switch (args[1]) {
                                 case "v": {
                                     AddVideo.addVideo(args[2],  con);
+                                    break;
                                 }
                                 case "p": {
-                                    AddVideo.addPlaylist(args[2],0,  con);
+                                    if (args.length > 3) AddVideo.addPlaylist(args[2], Integer.parseInt(args[3]), con);
+                                    else AddVideo.addPlaylist(args[2], 0, con);
+                                    break;
+                                }
+                                case "c": {
+                                    if (args.length > 3) AddVideo.addChannel(args[2], Integer.parseInt(args[3]), con);
+                                    else AddVideo.addChannel(args[2], 0, con);
+                                    break;
                                 }
                             }
                             output.writeUTF("+add;/" + args[2]);
                         } catch (YoutubeException | VideoCodecNotFoundException | SQLException | IOException e) {
                             e.printStackTrace();
                             try {
-                                output.writeUTF("-add;/" + args[2] + ";/" + e.toString());
+                                output.writeUTF("-add;/" + args[2] + ";/" + e);
                             } catch (IOException ioException) {
                                 ioException.printStackTrace();
                             }
@@ -179,20 +187,28 @@ public class Server {
                                 rs.next();
                                 int videos = rs.getInt(1);
                                 rs = con.prepareStatement("SELECT VideoID from videolist").executeQuery();
-                                output.writeUTF("+update;/" + videos);
+                                output.writeUTF("+updatenr;/" + videos);
                                 while (rs.next()) {
-                                    UpdateVideo.checkVideo(rs.getString(1), con);
-                                    output.writeUTF("+update;/" + rs.getRow());
+                                    try {
+                                        UpdateVideo.checkVideo(rs.getString(1), con);
+                                        output.writeUTF("+update;/" + rs.getRow());
+                                    } catch (VideoCodecNotFoundException e) {
+                                        output.writeUTF("-update;/" + rs.getRow() + e);
+                                    }
                                 }
                             } else {
-                                output.writeUTF("+update;/1");
-                                UpdateVideo.checkVideo(args[1], con);
-                                output.writeUTF("+update;/1");
+                                try {
+                                    UpdateVideo.checkVideo(args[1], con);
+                                    output.writeUTF("+update;/" + args[1]);
+                                } catch (VideoCodecNotFoundException e) {
+                                    output.writeUTF("-update;/" + args[1] + e);
+                                }
+
                             }
-                        } catch (SQLException | IOException | VideoCodecNotFoundException e) {
+                        } catch (IOException | SQLException e) {
                             e.printStackTrace();
                             try {
-                                output.writeUTF("-update;/" + e.toString());
+                                output.writeUTF("-update;/" + e);
                             } catch (IOException ioException) {
                                 ioException.printStackTrace();
                             }
