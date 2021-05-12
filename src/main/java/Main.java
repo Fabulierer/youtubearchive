@@ -55,6 +55,7 @@ public class Main {
                 checkTable("archivedthumbnail", con);
                 checkTable("archivedtitle", con);
                 checkTable("archivedtags", con);
+                checkTable("archivedchannelname", con);
                 checkTable("messages", con);
                 checkTable("playlists", con);
                 updateTables(con);
@@ -369,6 +370,13 @@ public class Main {
                             "VideoID varchar(255)," +
                             "Time TIMESTAMP," +
                             "PRIMARY KEY (TagsVersionID))").execute();
+                    break;
+                case "archivedchannelname":
+                    con.prepareStatement("CREATE TABLE archivedchannelname(" +
+                            "ChannelNameVersionID int NOT NULL AUTO_INCREMENT," +
+                            "VideoID varchar(255)," +
+                            "Time TIMESTAMP," +
+                            "PRIMARY KEY (ChannelNameVersionID))").execute();
                     break;
                 case "messages":
                     con.prepareStatement("CREATE TABLE messages(" +

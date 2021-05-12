@@ -187,6 +187,21 @@ public class UpdateVideo {
                 public void message(String format, String videoId) {}
             }, -1);
 
+            // Thumbnail download block
+            checkFile("ChannelName", "txt", videoId, con, new DownloadFormat() {
+                @Override
+                public File downloadFile(String videoId, int itag) throws IOException, YoutubeException {
+                    File downloadedFile = new File("./temp.txt");
+                    FileUtils.writeStringToFile(downloadedFile, v.details().author(), "UTF-8");
+                    return downloadedFile;
+                }
+            }, new onFileUpdate() {
+                // Changes in name of channel can cause messages to be full of just channel name changes, so they are not reported.
+                @Override
+                public void message(String format, String videoId) {}
+            }, -1);
+
+
             // Title download block
             checkFile("Title", "txt", videoId, con, new DownloadFormat() {
                 @Override
@@ -229,13 +244,7 @@ public class UpdateVideo {
             ps.execute();
         } catch (YoutubeException e) {
             Main.sendMessage(con, "Video with VideoID " + videoId + " couldn't be found. Did it get deleted?");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (SQLException | IllegalAccessException | IOException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
