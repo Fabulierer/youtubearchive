@@ -76,9 +76,16 @@ public class UpdateVideo {
                     System.out.println("Checking Video: [" + rs.getRow() + "/" + elements + "] (" + (int) (rs.getRow() * 10000.0 / elements) / 100.0 + "%)");
                     try {
                         checkVideo(rs.getString(1), con);
-                    } catch (VideoCodecNotFoundException e) {
-                        e.printStackTrace();
-                        brokenIds.add(rs.getString(1));
+                    } catch (VideoCodecNotFoundException ignored) {
+                        if (isYoutubeAvailable()) brokenIds.add(rs.getString(1));
+                        else {
+                            try {
+                                checkVideo(rs.getString(1), con);
+                            } catch (VideoCodecNotFoundException e) {
+                                e.printStackTrace();
+                                brokenIds.add(rs.getString(1));
+                            }
+                        }
                     }
                 } else System.out.println("Video skipped because it is not set active.");
             }
@@ -351,6 +358,20 @@ public class UpdateVideo {
         if (mimeType.contains("hls")) return "hls";
         if (mimeType.contains("3gp")) return "3gp";
         throw new VideoCodecNotFoundException(mimeType);
+    }
+
+    /**
+     * @return tries to check "Me at the Zoo", continues to do so until video is found.
+     */
+    private static boolean isYoutubeAvailable() {
+        YoutubeDownloader d = new YoutubeDownloader();
+        try {
+            YoutubeVideo v = d.getVideo("jNQXAC9IVRw");
+        } catch (YoutubeException e) {
+            System.out.println("Connection seems to be unstable or \"Me at the Zoo\" is offline.");
+            return isYoutubeAvailable();
+        }
+        return true;
     }
 
 }

@@ -69,6 +69,8 @@ public class Main {
                     System.out.println("Directory 'storage' already exists.");
                 }
 
+                Server.startServer(con);
+
                 System.out.println();
 
                 while (!quit) {
@@ -213,10 +215,6 @@ public class Main {
                             } else {
                                 System.out.println("In order to complete a wipe, you must create a file called wipe.");
                             }
-                            break;
-                        case "startserver":
-                        case "ss":
-                            Server.startServer(con);
                             break;
                         case "help":
                         case "h":

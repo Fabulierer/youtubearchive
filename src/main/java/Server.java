@@ -18,13 +18,17 @@ public class Server {
     private static Connection con;
 
     public static void startServer(Connection con) {
-        Server.con = con;
-        try {
-            prepareServer(256);
-            serverLoop();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Thread t = new Thread(() -> {
+            Server.con = con;
+            try {
+                prepareServer(256);
+                serverLoop();
+            } catch (IOException e) {
+                e.printStackTrace();
+                startServer(con);
+            }
+        });
+        t.start();
     }
 
     private static void prepareServer(int port) throws IOException {
@@ -48,6 +52,7 @@ public class Server {
             String command;
             try {
                 command = input.readUTF();
+                System.out.println("[IN] " + command);
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
