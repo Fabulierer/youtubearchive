@@ -197,7 +197,7 @@ public class Server {
                                     try {
                                         UpdateVideo.checkVideo(rs.getString(1), con);
                                         output.writeUTF("+update;/" + rs.getRow());
-                                    } catch (VideoCodecNotFoundException e) {
+                                    } catch (VideoCodecNotFoundException | YoutubeException e) {
                                         output.writeUTF("-update;/" + rs.getRow() + e);
                                     }
                                 }
@@ -205,7 +205,7 @@ public class Server {
                                 try {
                                     UpdateVideo.checkVideo(args[1], con);
                                     output.writeUTF("+update;/" + args[1]);
-                                } catch (VideoCodecNotFoundException e) {
+                                } catch (VideoCodecNotFoundException | YoutubeException e) {
                                     output.writeUTF("-update;/" + args[1] + e);
                                 }
 
