@@ -21,16 +21,16 @@ public class Main {
         File[] computerDrives = File.listRoots();
         File settings = new File("./settings.txt");
         if (settings.createNewFile()) {
-            System.out.println("New Settings file created!");
+            println("New Settings file created!");
             FileWriter fileWriter = new FileWriter(settings);
             fileWriter.write("url \nuser \npassword \ndrive ");
             fileWriter.close();
-            System.out.println("The following drives have been found. Please pick one in the \"settings.txt\" file.");
+            println("The following drives have been found. Please pick one in the \"settings.txt\" file.");
             for (int i = 0; i < computerDrives.length; i++) {
-                System.out.println(i + ": " + computerDrives[i]);
+                println(i + ": " + computerDrives[i]);
             }
             return;
-        } else System.out.println("Settings file found...");
+        } else println("Settings file found...");
 
         Scanner settingsScanner = new Scanner(settings);
 
@@ -42,12 +42,12 @@ public class Main {
                 String password = settingsScanner.nextLine().split(" ")[1];
                 drive = Integer.parseInt(settingsScanner.nextLine().split(" ")[1]);
 
-                System.out.println("Settings successfully loaded!");
-                System.out.println("Trying to connect to database...");
+                println("Settings successfully loaded!");
+                println("Trying to connect to database...");
 
                 Connection con = DriverManager.getConnection(url, user, password);
                 con.prepareStatement("SET CHARACTER SET utf8").execute();
-                System.out.println("Successfully connected to database!");
+                println("Successfully connected to database!");
 
                 checkTable("videolist", con);
                 checkTable("archivedlowvideoaudio", con);
@@ -62,30 +62,30 @@ public class Main {
                 checkTable("playlists", con);
                 updateTables(con);
 
-                System.out.println("Checking if 'storage' directory exists...");
+                println("Checking if 'storage' directory exists...");
                 Path storage = Paths.get("./storage/");
                 try {
                     Files.createDirectory(storage);
-                    System.out.println("Directory 'storage' has been created.");
+                    println("Directory 'storage' has been created.");
                 } catch (FileAlreadyExistsException e) {
-                    System.out.println("Directory 'storage' already exists.");
+                    println("Directory 'storage' already exists.");
                 }
 
-                System.out.println("Starting server...");
+                println("Starting server...");
                 Server.startServer(con);
 
-                System.out.println("Checking version...");
-                System.out.println(checkVersion() ? "You're up to date!" : "A new version is available to download!");
+                println("Checking version...");
+                println(checkVersion() ? "You're up to date!" : "A new version is available to download!");
 
-                System.out.println();
+                println();
 
                 while (!quit) {
                     checkUnreadMessages(con);
-                    System.out.println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
+                    println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
                             " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
 
                     Scanner scan = new Scanner(System.in);
-                    System.out.print("YoutubeArchive> ");
+                    print("YoutubeArchive> ");
                     String cmd = scan.nextLine();
                     String[] args = cmd.split(" ");
                     args[0] = args[0].toLowerCase();
@@ -96,7 +96,7 @@ public class Main {
                             if (args.length > 1) {
                                 AddVideo.addVideo(args[1], con);
                             } else {
-                                System.out.println("You need to use at least 1 parameter! Use h for more information!");
+                                println("You need to use at least 1 parameter! Use h for more information!");
                             }
                             break;
                         case "addplaylist":
@@ -104,7 +104,7 @@ public class Main {
                             if (args.length > 1) {
                                 AddVideo.addPlaylist(args[1], Integer.parseInt(args[2]), con);
                             } else {
-                                System.out.println("You need to use 2 parameters! Use h for more information!");
+                                println("You need to use 2 parameters! Use h for more information!");
                             }
                             break;
                         case "addchannel":
@@ -112,7 +112,7 @@ public class Main {
                             if (args.length > 1) {
                                 AddVideo.addChannel(args[1], Integer.parseInt(args[2]), con);
                             } else {
-                                System.out.println("You need to use 2 parameters! Use h for more information!");
+                                println("You need to use 2 parameters! Use h for more information!");
                             }
                             break;
                         case "update":
@@ -142,7 +142,7 @@ public class Main {
                                 length = 25;
                             } else if (Integer.parseInt(args[1]) < 12) {
                                 length = 25;
-                                System.out.println("Length must be at least 12!");
+                                println("Length must be at least 12!");
                             } else length = Integer.parseInt(args[1]);
                             PreparedStatement ps = con.prepareStatement("SELECT SUBSTRING(VideoTitle, 1, (?)) AS Title," +
                                     "ChannelName AS Channel," +
@@ -163,19 +163,19 @@ public class Main {
                         case "clearmessages":
                         case "cm":
                             con.prepareStatement("DELETE FROM messages WHERE MessageRead = 1").execute();
-                            System.out.println("Read messages have been removed!");
+                            println("Read messages have been removed!");
                             break;
                         case "remove":
                         case "r":
                             if (args.length <= 2) {
-                                System.out.println("This command requires the use of 2 parameters! Check h for help.");
+                                println("This command requires the use of 2 parameters! Check h for help.");
                             } else {
                                 boolean correctArgument = false;
                                 if (args[1].equalsIgnoreCase("list") || args[1].equalsIgnoreCase("both")) {
                                     ps = con.prepareStatement("DELETE FROM videolist WHERE VideoID = (?)");
                                     ps.setString(1, args[2]);
                                     ps.execute();
-                                    System.out.println("Successfully deleted the video of the list!");
+                                    println("Successfully deleted the video of the list!");
                                     correctArgument = true;
                                 }
                                 if (args[1].equalsIgnoreCase("storage") || args[1].equalsIgnoreCase("both")) {
@@ -196,14 +196,14 @@ public class Main {
                                     ps.execute();
                                     File directory = new File("./storage/" + args[2]);
                                     if (directory.delete()) {
-                                        System.out.println("Successfully deleted every saved file from the given video.");
+                                        println("Successfully deleted every saved file from the given video.");
                                     } else {
-                                        System.out.println("Something went wrong while trying to delete the storage directory for the video.");
+                                        println("Something went wrong while trying to delete the storage directory for the video.");
                                     }
                                     correctArgument = true;
                                 }
                                 if (!correctArgument) {
-                                    System.out.println("Your first argument needs to be either list, storage or both.");
+                                    println("Your first argument needs to be either list, storage or both.");
                                 }
                             }
                             break;
@@ -213,18 +213,18 @@ public class Main {
                                 con.prepareStatement("DROP TABLE " +
                                         "archivedlowvideoaudio, archivedaudio, archiveddescription, archivedthumbnail, archivedtitle," +
                                         "archivedvideo, messages, videolist").execute();
-                                System.out.println("Database has been wiped!");
+                                println("Database has been wiped!");
                                 FileUtils.deleteDirectory(new File("storage"));
-                                System.out.println("Storage has been wiped!");
-                                System.out.println("Quitting YoutubeArchive...");
+                                println("Storage has been wiped!");
+                                println("Quitting YoutubeArchive...");
                                 quit = true;
                             } else {
-                                System.out.println("In order to complete a wipe, you must create a file called wipe.");
+                                println("In order to complete a wipe, you must create a file called wipe.");
                             }
                             break;
                         case "help":
                         case "h":
-                            System.out.println("Help:\n" +
+                            println("Help:\n" +
                                     "addvideo/av (videoId) | adds a video to the list.\n" +
                                     "addplaylist/ap (playlistID) (minViews) | adds playlist\n" +
                                     "addchannel/ac (channelId) (minViews) | adds the channel uploads playlist to the playlist list\n" +
@@ -241,11 +241,11 @@ public class Main {
                             break;
                         case "quit":
                         case "q":
-                            System.out.println("Quitting YoutubeArchive...");
+                            println("Quitting YoutubeArchive...");
                             quit = true;
                             break;
                         default:
-                            System.out.println("Unknown command! Use h for help!");
+                            println("Unknown command! Use h for help!");
                             break;
                     }
                 }
@@ -264,7 +264,7 @@ public class Main {
         try {
             con.prepareStatement("SELECT LowVideoAudioItag FROM videolist").execute();
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("Updating the 'videolist' table: adding 'lowVideoAudioItag'");
+            println("Updating the 'videolist' table: adding 'lowVideoAudioItag'");
             con.prepareStatement("ALTER TABLE videolist ADD LowVideoAudioItag int").execute();
             ResultSet rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
             while (rs.next()) {
@@ -283,7 +283,7 @@ public class Main {
         try {
             con.prepareStatement("SELECT Views FROM playlists").execute();
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("Updating the 'playlist' table: adding 'Views'");
+            println("Updating the 'playlist' table: adding 'Views'");
             con.prepareStatement("ALTER TABLE playlists ADD Views int").execute();
             ResultSet rs = con.prepareStatement("SELECT Playlist FROM playlists").executeQuery();
             while (rs.next()) {
@@ -301,19 +301,19 @@ public class Main {
         try {
             con.prepareStatement("SELECT Active FROM videolist").execute();
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("Updating the 'videolist' table: adding 'Active'");
+            println("Updating the 'videolist' table: adding 'Active'");
             con.prepareStatement("ALTER TABLE videolist ADD Active boolean").execute();
             con.prepareStatement("UPDATE videolist SET Active = 1").execute();
         }
     }
 
     private static void checkTable(String tableName, Connection con) throws SQLException, TableCreationFailedException {
-        System.out.println("Checking if table " + tableName + " exists...");
+        println("Checking if table " + tableName + " exists...");
         try {
             con.prepareStatement("SELECT * FROM " + tableName).execute();
-            System.out.println("Found the " + tableName + " Table.");
+            println("Found the " + tableName + " Table.");
         } catch (SQLSyntaxErrorException e) {
-            System.out.println("Couldn't find table '" + tableName + "'. Creating a new one...");
+            println("Couldn't find table '" + tableName + "'. Creating a new one...");
             switch (tableName) {
                 case "videolist":
                     con.prepareStatement("CREATE TABLE videolist(" +
@@ -402,7 +402,7 @@ public class Main {
             }
             try {
                 con.prepareStatement("SELECT * FROM " + tableName).executeQuery();
-                System.out.println("Successfully created the new Table!");
+                println("Successfully created the new Table!");
             } catch (SQLSyntaxErrorException ee) {
                 ee.printStackTrace();
                 throw new TableCreationFailedException();
@@ -421,8 +421,8 @@ public class Main {
             ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             ps.execute();
         } catch (SQLException e) {
-            System.out.println("Something went wrong while trying to save a message!");
-            System.out.println("The message should have been: " + msg);
+            println("Something went wrong while trying to save a message!");
+            println("The message should have been: " + msg);
             e.printStackTrace();
         }
     }
@@ -430,25 +430,25 @@ public class Main {
     private static void printTable(ResultSet rs, int length) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
-            System.out.print(rsmd.getColumnName(i));
+            print(rsmd.getColumnName(i));
             for (int j = 0; j < length - rsmd.getColumnName(i).length(); j++) {
-                System.out.print(" ");
+                print(" ");
             }
-            if (i != rsmd.getColumnCount()) System.out.print(" | ");
+            if (i != rsmd.getColumnCount()) print(" | ");
         }
         while (rs.next()) {
-            System.out.println();
+            println();
             for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
                 String content = rs.getString(i);
                 if (content == null) content = "null"; // To prevent Nullpointer in "content.length()"
-                System.out.print(content);
+                print(content);
                 for (int j = 0; j < length - content.length(); j++) {
-                    System.out.print(" ");
+                    print(" ");
                 }
-                if (i != rsmd.getColumnCount()) System.out.print(" | ");
+                if (i != rsmd.getColumnCount()) print(" | ");
             }
         }
-        System.out.println();
+        println();
     }
 
     private static void printTableMax(ResultSet rs) throws SQLException {
@@ -461,7 +461,7 @@ public class Main {
             }
         }
         while (rs.next()) {
-            System.out.println();
+            println();
             for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
                 if (length[i - 1] < rs.getString(i).length()) {
                     length[i - 1] = rs.getString(i).length();
@@ -469,33 +469,33 @@ public class Main {
             }
         }
         for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
-            System.out.print(rsmd.getColumnName(i));
+            print(rsmd.getColumnName(i));
             for (int j = 0; j < length[i - 1] - rsmd.getColumnName(i).length(); j++) {
-                System.out.print(" ");
+                print(" ");
             }
-            if (i != rsmd.getColumnCount()) System.out.print(" | ");
+            if (i != rsmd.getColumnCount()) print(" | ");
         }
         rs.beforeFirst();
         while (rs.next()) {
-            System.out.println();
+            println();
             for (int i = 1; i < rsmd.getColumnCount() + 1; i++) {
                 String content = rs.getString(i);
                 if (content == null) content = "null"; // To prevent Nullpointer in "content.length()"
-                System.out.print(content);
+                print(content);
                 for (int j = 0; j < length[i - 1] - content.length(); j++) {
-                    System.out.print(" ");
+                    print(" ");
                 }
-                if (i != rsmd.getColumnCount()) System.out.print(" | ");
+                if (i != rsmd.getColumnCount()) print(" | ");
             }
         }
-        System.out.println();
+        println();
     }
 
     private static void checkUnreadMessages(Connection con) throws SQLException {
         ResultSet rs = con.prepareStatement("SELECT * FROM messages WHERE MessageRead = 0").executeQuery();
         int unreadMessages = 0;
         while (rs.next()) unreadMessages++;
-        if (unreadMessages != 0) System.out.println("You have " + unreadMessages + " unread messages!");
+        if (unreadMessages != 0) println("You have " + unreadMessages + " unread messages!");
     }
 
     private static boolean checkVersion() {
@@ -521,6 +521,26 @@ public class Main {
             e.printStackTrace();
         }
         return true;
+    }
+    
+    public static void println(String s) {
+        System.out.print(s + "\n");
+        Server.sendMessage(s + "\n");
+    }
+
+    public static void println() {
+        System.out.print("\n");
+        Server.sendMessage("\n");
+    }
+
+    public static void print(String s) {
+        System.out.print(s);
+        Server.sendMessage(s);
+    }
+
+    public static void print() {
+        System.out.print("");
+        Server.sendMessage("");
     }
 
 }

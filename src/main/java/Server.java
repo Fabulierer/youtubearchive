@@ -16,6 +16,7 @@ public class Server {
     private static ServerSocket server;
     private static Socket client;
     private static Connection con;
+    private static DataOutputStream output;
 
     public static void startServer(Connection con) {
         Thread t = new Thread(() -> {
@@ -31,16 +32,19 @@ public class Server {
         t.start();
     }
 
+    public static void sendMessage(String s) {
+        if (client != null) try { output.writeUTF(s); } catch (IOException ignore) {}
+    }
+
     private static void prepareServer(int port) throws IOException {
         server = new ServerSocket(port);
-        System.out.println("Server started! Waiting for client...");
+        Main.println("Server started! Waiting for client...");
         client = server.accept();
-        System.out.println("Client with IP " + client.getInetAddress() + " connected!");
+        Main.println("Client with IP " + client.getInetAddress() + " connected!");
     }
 
     private static void serverLoop() {
         DataInputStream input;
-        DataOutputStream output;
         try {
             input = new DataInputStream(client.getInputStream());
             output = new DataOutputStream(client.getOutputStream());
