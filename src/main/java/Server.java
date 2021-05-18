@@ -17,9 +17,10 @@ public class Server {
     private static Socket client;
     private static Connection con;
     private static DataOutputStream output;
+    private static Thread t;
 
     public static void startServer(Connection con) {
-        Thread t = new Thread(() -> {
+        t = new Thread(() -> {
             Server.con = con;
             try {
                 prepareServer(256);
@@ -34,6 +35,10 @@ public class Server {
 
     public static void sendMessage(String s) {
         if (client != null) try { output.writeUTF(s); } catch (IOException ignore) {}
+    }
+
+    public static void stopServer() {
+        t.interrupt();
     }
 
     private static void prepareServer(int port) throws IOException {

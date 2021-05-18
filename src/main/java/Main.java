@@ -15,6 +15,7 @@ import java.util.Scanner;
 
 public class Main {
 
+    public static String ver = "1.4.3.1";
     public static int drive;
 
     public static void main(String[] arguments) throws DatabaseConnectionFailedException, IOException {
@@ -257,6 +258,7 @@ public class Main {
                 throw new DatabaseConnectionFailedException();
             }
         }
+        Server.stopServer();
     }
 
     private static void updateTables(Connection con) throws SQLException {
@@ -500,10 +502,6 @@ public class Main {
 
     private static boolean checkVersion() {
         try {
-            MavenXpp3Reader reader = new MavenXpp3Reader();
-            Model model = reader.read(new FileReader("pom.xml"));
-            String ver = model.getVersion();
-
             File json = new File("latest.json");
             FileUtils.copyURLToFile(new URL("https://api.github.com/repos/Fabulierer/youtubearchive/releases/latest"),
                     json);
@@ -517,7 +515,7 @@ public class Main {
                     return ver.equals(newest);
                 }
             }
-        } catch (XmlPullParserException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return true;
