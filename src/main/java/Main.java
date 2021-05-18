@@ -1,9 +1,11 @@
 import com.github.kiulian.downloader.YoutubeException;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,7 +71,11 @@ public class Main {
                     System.out.println("Directory 'storage' already exists.");
                 }
 
+                System.out.println("Starting server...");
                 Server.startServer(con);
+
+                System.out.println("Checking version...");
+                System.out.println(checkVersion() ? "You're up to date!" : "A new version is available to download!");
 
                 System.out.println();
 
@@ -490,6 +496,31 @@ public class Main {
         int unreadMessages = 0;
         while (rs.next()) unreadMessages++;
         if (unreadMessages != 0) System.out.println("You have " + unreadMessages + " unread messages!");
+    }
+
+    private static boolean checkVersion() {
+        try {
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            Model model = reader.read(new FileReader("pom.xml"));
+            String ver = model.getVersion();
+
+            File json = new File("latest.json");
+            FileUtils.copyURLToFile(new URL("https://api.github.com/repos/Fabulierer/youtubearchive/releases/latest"),
+                    json);
+            Scanner scan = new Scanner(json);
+            scan.useDelimiter(",");
+            while (scan.hasNext()) {
+                String read = scan.next();
+                if (read.startsWith("\"tag_name\":")) {
+                    String newest = read.replace("\"", "").
+                            replace("tag_name:", "");
+                    return ver.equals(newest);
+                }
+            }
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
 }
