@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +26,8 @@ public class Server {
             try {
                 prepareServer(256);
                 serverLoop();
-            } catch (IOException e) {
+            } catch (SocketException ignored) {}
+            catch (IOException e) {
                 e.printStackTrace();
                 startServer(con);
             }
@@ -38,6 +40,12 @@ public class Server {
     }
 
     public static void stopServer() {
+        Main.println("Killing server...");
+        try {
+            server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         t.interrupt();
     }
 
