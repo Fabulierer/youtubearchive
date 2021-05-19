@@ -36,7 +36,7 @@ public class Server {
     }
 
     public static void sendMessage(String s) {
-        if (client != null) try { output.writeUTF(s); } catch (IOException ignore) {}
+        if (client != null) try { output.writeUTF(s); } catch (IOException | NullPointerException ignore) {}
     }
 
     public static void stopServer() {
