@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static String ver = "1.4.3.1";
+    public static String ver = "1.4.3.2";
     public static int drive;
 
     public static void main(String[] arguments) throws DatabaseConnectionFailedException, IOException {
