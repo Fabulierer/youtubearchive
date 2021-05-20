@@ -26,7 +26,9 @@ public class Server {
             try {
                 prepareServer(256);
                 serverLoop();
-            } catch (SocketException ignored) {}
+            } catch (SocketException e) {
+                if (e.getMessage().equals("Connection reset")) startServer(con);
+            }
             catch (IOException e) {
                 e.printStackTrace();
                 startServer(con);
@@ -36,7 +38,13 @@ public class Server {
     }
 
     public static void sendMessage(String s) {
-        if (client != null) try { output.writeUTF("+log;/" + s); } catch (IOException | NullPointerException ignore) {}
+        if (client != null) {
+            try {
+                new DataOutputStream(client.getOutputStream()).writeUTF("+log;/" + s);
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void stopServer() {
