@@ -28,6 +28,14 @@ public class Menu {
             Scanner scan = new Scanner(System.in);
             print("YoutubeArchive> ");
             String cmd;
+
+            while (commandCounter == 0 && !scan.hasNextLine()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             if (commandCounter != 0) {
                 cmd = commandQueue.remove();
                 commandCounter--;
