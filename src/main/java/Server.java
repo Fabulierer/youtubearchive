@@ -19,6 +19,7 @@ public class Server {
     private static Connection con;
     private static DataOutputStream output;
     private static Thread t;
+    private static boolean on = true;
 
     public static void startServer(Connection con) {
         t = new Thread(() -> {
@@ -26,12 +27,8 @@ public class Server {
             try {
                 prepareServer(256);
                 serverLoop();
-            } catch (SocketException e) {
-                if (e.getMessage().equals("Connecion reset")) startServer(con);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-                startServer(con);
+            } catch (IOException e) {
+                if (on) startServer(con);
             }
         });
         t.start();
@@ -49,6 +46,7 @@ public class Server {
 
     public static void stopServer() {
         Menu.println("Killing server...");
+        on = false;
         try {
             server.close();
         } catch (IOException e) {
