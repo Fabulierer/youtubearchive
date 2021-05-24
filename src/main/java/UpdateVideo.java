@@ -23,9 +23,9 @@ public class UpdateVideo {
         TimerTask tt = new TimerTask() {
             @Override
             public void run() {
-                Main.println("Starting Scheduled Update!");
+                Menu.println("Starting Scheduled Update!");
                 checkAll(con);
-                Main.print("Scheduled Update complete!\nYoutubeArchive> ");
+                Menu.print("Scheduled Update complete!\nYoutubeArchive> ");
             }
         };
         t = new Timer();
@@ -36,7 +36,7 @@ public class UpdateVideo {
     public static void checkAll(Connection con) {
         try {
             // Update videolist (add playlists)
-            Main.println("Updating videolist to include new videos found in playlists...");
+            Menu.println("Updating videolist to include new videos found in playlists...");
             ResultSet rs = con.prepareStatement("SELECT Playlist, Views, Count(*) FROM playlists").executeQuery();
             YoutubeDownloader downloader = new YoutubeDownloader();
             for (int i = 0; rs.next(); i++) {
@@ -44,43 +44,43 @@ public class UpdateVideo {
                     isYoutubeAvailable();
                     List<PlaylistVideoDetails> pl = downloader.getPlaylist(rs.getString(1)).videos();
                     for (int j = 0; j < pl.size(); j++) {
-                        Main.println("Playlist: [" + i + "/" + rs.getInt(3) + "] (" + (int) (i * 10000.0 / rs.getInt(3)) / 100.0 + "%)" +
+                        Menu.println("Playlist: [" + i + "/" + rs.getInt(3) + "] (" + (int) (i * 10000.0 / rs.getInt(3)) / 100.0 + "%)" +
                                 ", Video: [" + j + "/" + pl.size() + "] (" + (int) (j * 10000.0 / pl.size()) / 100.0 + "%)");
                         try {
                             String videoId = pl.get(j).videoId();
                             if (downloader.getVideo(videoId).details().viewCount() > rs.getInt(2)) {
                                 AddVideo.addVideo(videoId, con);
                             } else {
-                                Main.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
+                                Menu.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
                             }
                         } catch (SQLException | VideoCodecNotFoundException e) {
-                            Main.println("Video with ID " + pl.get(j).videoId() + " is not available anymore.");
+                            Menu.println("Video with ID " + pl.get(j).videoId() + " is not available anymore.");
                             e.printStackTrace();
                         } catch (YoutubeException ytex) {
                             isYoutubeAvailable();
-                            Main.println("Playlist: [" + i + "/" + rs.getInt(3) + "] (" + (int) (i * 10000.0 / rs.getInt(3)) / 100.0 + "%)" +
+                            Menu.println("Playlist: [" + i + "/" + rs.getInt(3) + "] (" + (int) (i * 10000.0 / rs.getInt(3)) / 100.0 + "%)" +
                                     ", Video: [" + j + "/" + pl.size() + "] (" + (int) (j * 10000.0 / pl.size()) / 100.0 + "%)");
                             try {
                                 String videoId = pl.get(j).videoId();
                                 if (downloader.getVideo(videoId).details().viewCount() > rs.getInt(2)) {
                                     AddVideo.addVideo(videoId, con);
                                 } else {
-                                    Main.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
+                                    Menu.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
                                 }
                             } catch (SQLException | VideoCodecNotFoundException | YoutubeException e) {
-                                Main.println("Video with ID " + pl.get(j).videoId() + " is not available anymore.");
+                                Menu.println("Video with ID " + pl.get(j).videoId() + " is not available anymore.");
                                 e.printStackTrace();
                             }
                         }
                     }
                 } catch (YoutubeException e) {
-                    Main.println("Playlist with ID " + rs.getString(1) + " could not be found.");
+                    Menu.println("Playlist with ID " + rs.getString(1) + " could not be found.");
                     e.printStackTrace();
                 }
             }
 
             rs = con.prepareStatement("SELECT VideoID, Active FROM videolist").executeQuery();
-            Main.println("Checking every video.");
+            Menu.println("Checking every video.");
             int elements = 0;
             while (rs.next()) {
                 elements++;
@@ -89,11 +89,11 @@ public class UpdateVideo {
             ArrayList<String> brokenIds = new ArrayList<>();
             while (rs.next()) {
                 if (rs.getInt(2) == 1) {
-                    Main.println("Checking Video: [" + rs.getRow() + "/" + elements + "] (" + (int) (rs.getRow() * 10000.0 / elements) / 100.0 + "%)");
+                    Menu.println("Checking Video: [" + rs.getRow() + "/" + elements + "] (" + (int) (rs.getRow() * 10000.0 / elements) / 100.0 + "%)");
                     try {
                         checkVideo(rs.getString(1), con);
                     } catch (VideoCodecNotFoundException | YoutubeException | IOException ignored) {
-                        Main.println("Video could not be found.");
+                        Menu.println("Video could not be found.");
                         // Second attempt, this time internet connection gets checked.
                         isYoutubeAvailable();
                         // When you get here, internet is confirmed to work.
@@ -104,19 +104,19 @@ public class UpdateVideo {
                             brokenIds.add(rs.getString(1));
                         }
                     }
-                } else Main.println("Video skipped because it is not set active.");
+                } else Menu.println("Video skipped because it is not set active.");
             }
-            Main.println(brokenIds.size() + " videos could not be found. Want to disable them? (Y/N)");
+            Menu.println(brokenIds.size() + " videos could not be found. Want to disable them? (Y/N)");
             Scanner scan = new Scanner(System.in);
             if (scan.next().equals("Y")) {
                 for (int i = 0; i < brokenIds.size(); i++) {
                     PreparedStatement ps = con.prepareStatement("UPDATE videolist SET Active = 0 WHERE VideoID = (?)");
                     ps.setString(1, brokenIds.get(i));
                 }
-                Main.println("Not available videos are disabled!");
+                Menu.println("Not available videos are disabled!");
             }
             else {
-                Main.println("Changed nothing about the enabled status of videos.");
+                Menu.println("Changed nothing about the enabled status of videos.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -125,7 +125,7 @@ public class UpdateVideo {
 
     public static void checkVideo(String videoId, Connection con) throws VideoCodecNotFoundException, YoutubeException, IOException {
         try {
-            Main.println("Checking Video with Video ID: " + videoId);
+            Menu.println("Checking Video with Video ID: " + videoId);
             YoutubeDownloader d = new YoutubeDownloader();
             YoutubeVideo v = d.getVideo(videoId);
             PreparedStatement ps = con.prepareStatement("SELECT VideoItag, AudioItag, LowVideoAudioItag FROM videolist WHERE VideoID = (?)");
@@ -156,7 +156,7 @@ public class UpdateVideo {
                         }, new onFileUpdate() {
                             @Override
                             public void message(String format, String videoId) {
-                                Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                                Menu.sendMessage(con, "+change;" + videoId + ";" + format);
                             }
                         }, itagVideo);
 
@@ -171,7 +171,7 @@ public class UpdateVideo {
                         }, new onFileUpdate() {
                             @Override
                             public void message(String format, String videoId) {
-                                Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                                Menu.sendMessage(con, "+change;" + videoId + ";" + format);
                             }
                         }, itagAudio);
                     } catch (IOException | SQLException | InvocationTargetException | IllegalAccessException | YoutubeException | VideoCodecNotFoundException e) {
@@ -191,7 +191,7 @@ public class UpdateVideo {
             }, new onFileUpdate() {
                 @Override
                 public void message(String format, String videoId) {
-                    Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                    Menu.sendMessage(con, "+change;" + videoId + ";" + format);
                 }
             }, -1);
 
@@ -237,7 +237,7 @@ public class UpdateVideo {
             }, new onFileUpdate() {
                 @Override
                 public void message(String format, String videoId) {
-                    Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                    Menu.sendMessage(con, "+change;" + videoId + ";" + format);
                 }
             }, -1);
 
@@ -257,7 +257,7 @@ public class UpdateVideo {
             }, new onFileUpdate() {
                 @Override
                 public void message(String format, String videoId) {
-                    Main.sendMessage(con, "+change;" + videoId + ";" + format);
+                    Menu.sendMessage(con, "+change;" + videoId + ";" + format);
                 }
             }, -1);
 
@@ -380,7 +380,7 @@ public class UpdateVideo {
      */
     private static void isYoutubeAvailable() {
         for (int i = 0; !tryYoutubeDownload(); i++) {
-            Main.println("Connection seems to be unstable or \"Me at the Zoo\" is offline. Attempt number " + i);
+            Menu.println("Connection seems to be unstable or \"Me at the Zoo\" is offline. Attempt number " + i);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
