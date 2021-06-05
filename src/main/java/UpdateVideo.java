@@ -37,14 +37,17 @@ public class UpdateVideo {
         try {
             // Update videolist (add playlists)
             Menu.println("Updating videolist to include new videos found in playlists...");
-            ResultSet rs = con.prepareStatement("SELECT Playlist, Views, Count(*) FROM playlists").executeQuery();
+            ResultSet rs = con.prepareStatement("SELECT Count(*) FROM playlists").executeQuery();
+            rs.next();
+            int playlists = rs.getInt(1);
+            rs = con.prepareStatement("SELECT Playlist, Views FROM playlists").executeQuery();
             YoutubeDownloader downloader = new YoutubeDownloader();
             for (int i = 0; rs.next(); i++) {
                 try {
                     isYoutubeAvailable();
                     List<PlaylistVideoDetails> pl = downloader.getPlaylist(rs.getString(1)).videos();
                     for (int j = 0; j < pl.size(); j++) {
-                        Menu.println("Playlist: [" + i + "/" + rs.getInt(3) + "] (" + (int) (i * 10000.0 / rs.getInt(3)) / 100.0 + "%)" +
+                        Menu.println("Playlist: [" + i + "/" + playlists + "] (" + (int) (i * 10000.0 / playlists) / 100.0 + "%)" +
                                 ", Video: [" + j + "/" + pl.size() + "] (" + (int) (j * 10000.0 / pl.size()) / 100.0 + "%)");
                         try {
                             String videoId = pl.get(j).videoId();

@@ -10,11 +10,26 @@ import java.util.Scanner;
 
 public class Menu {
 
-    private static Queue<String> commandQueue = new LinkedList<>();
-    private static int commandCounter = 0;
+    public static CommandQueue cmdQueue = new CommandQueue(10);
 
     public static void menuLoop(Connection con, int drive) {
         boolean quit = false;
+
+        Thread t = new Thread(() -> {
+            Scanner scan = new Scanner(System.in);
+            while (true) {
+                scan.hasNextLine();
+                System.out.println("Input detected!");
+                try {
+                    cmdQueue.addCmd(scan.nextLine());
+                    println("Command has been added!");
+                } catch (QueueLimitReachedException e) {
+                    println(e.toString());
+                }
+            }
+        });
+        t.start();
+
         while (!quit) {
             try {
                 checkUnreadMessages(con);
@@ -25,25 +40,22 @@ public class Menu {
             println("Free storage capacity: " + (computerDrives[drive].getFreeSpace() / 1073741824) +
                     " GB / " + (computerDrives[drive].getTotalSpace() / 1073741824) + " GB");
 
-            Scanner scan = new Scanner(System.in);
-            print("YoutubeArchive> ");
-            String cmd;
 
-            while (commandCounter == 0 && !scan.hasNextLine()) {
+            print("YoutubeArchive> ");
+
+
+            while (!cmdQueue.hasNextCmd()) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            if (commandCounter != 0) {
-                cmd = commandQueue.remove();
-                commandCounter--;
-            } else {
-                cmd = scan.nextLine();
-            }
+
+            String cmd = cmdQueue.getNextCmd();
             String[] args = cmd.split(" ");
             args[0] = args[0].toLowerCase();
+            println("Executing: " + cmd);
 
             try {
                 switch (args[0]) {
@@ -65,7 +77,7 @@ public class Menu {
                         break;
                     case "addchannel":
                     case "ac":
-                        if (args.length > 1) {
+                        if (args.length > 2) {
                             AddVideo.addChannel(args[1], Integer.parseInt(args[2]), con);
                         } else {
                             println("You need to use 2 parameters! Use h for more information!");
@@ -314,12 +326,11 @@ public class Menu {
     }
 
     public static String sendCommand(String s) {
-        if (commandCounter <= 10) {
-            commandQueue.add(s);
-            commandCounter++;
-            return "+cmd;/Command has been added!";
-        } else {
-            return "-cmd;/There can only be max. 10 commands in queue!";
+        try {
+            cmdQueue.addCmd(s);
+            return "+cmd;/Command has been added!\n";
+        } catch (QueueLimitReachedException e) {
+            return "-cmd;/" + e.toString();
         }
     }
 
