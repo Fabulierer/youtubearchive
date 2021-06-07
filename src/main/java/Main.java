@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static String ver = "1.4.4";
+    public static String ver = "1.4.5";
     public static int drive;
 
     public static void main(String[] arguments) throws DatabaseConnectionFailedException, IOException {
@@ -97,17 +97,22 @@ public class Main {
         } catch (SQLSyntaxErrorException e) {
             Menu.println("Updating the 'videolist' table: adding 'lowVideoAudioItag'");
             con.prepareStatement("ALTER TABLE videolist ADD LowVideoAudioItag int").execute();
+            Menu.println("Updating the 'videolist' table: adding 'Active'");
+            con.prepareStatement("ALTER TABLE videolist ADD Active int").execute();
+            con.prepareStatement("UPDATE videolist SET Active = 1").execute();
+            // Adding values to lowVideoAudioItag
             ResultSet rs = con.prepareStatement("SELECT VideoID FROM videolist").executeQuery();
             while (rs.next()) {
                 String videoId = rs.getString(1);
-                PreparedStatement ps = con.prepareStatement("DELETE FROM videolist WHERE VideoID = (?)");
-                ps.setString(1, videoId);
-                ps.execute();
                 try {
-                    AddVideo.addVideo(videoId, con);
+                    AddVideo.addVideo(videoId, con, true);
                 } catch (VideoCodecNotFoundException | YoutubeException videoCodecNotFoundException) {
                     videoCodecNotFoundException.printStackTrace();
                 }
+                PreparedStatement ps = con.prepareStatement("DELETE FROM videolist WHERE VideoID = (?) " +
+                        "AND LowVideoAudioItag IS NULL");
+                ps.setString(1, videoId);
+                ps.execute();
             }
         }
         // adds "Views" to playlist table
@@ -116,24 +121,22 @@ public class Main {
         } catch (SQLSyntaxErrorException e) {
             Menu.println("Updating the 'playlist' table: adding 'Views'");
             con.prepareStatement("ALTER TABLE playlists ADD Views int").execute();
-            ResultSet rs = con.prepareStatement("SELECT Playlist FROM playlists").executeQuery();
-            while (rs.next()) {
-                String playlist = rs.getString(1);
-                PreparedStatement ps = con.prepareStatement("DELETE FROM playlists WHERE Playlist = (?)");
-                ps.setString(1, playlist);
-                ps.execute();
-                try {
-                    AddVideo.addPlaylist(playlist,0, con);
-                } catch (YoutubeException videoCodecNotFoundException) {
-                    videoCodecNotFoundException.printStackTrace();
-                }
-            }
+            con.prepareStatement("UPDATE playlists SET Views = 0").execute();
         }
+        // adds "Active" to videolist table
         try {
             con.prepareStatement("SELECT Active FROM videolist").execute();
         } catch (SQLSyntaxErrorException e) {
             Menu.println("Updating the 'videolist' table: adding 'Active'");
             con.prepareStatement("ALTER TABLE videolist ADD Active boolean").execute();
+            con.prepareStatement("UPDATE videolist SET Active = 1").execute();
+        }
+        // adds "PlaylistTitle" to playlists table
+        try {
+            con.prepareStatement("SELECT PlaylistTitle FROM playlists").execute();
+        } catch (SQLSyntaxErrorException e) {
+            Menu.println("Updating the 'playlists' table: adding 'PlaylistTitle'");
+            con.prepareStatement("ALTER TABLE playlists ADD PlaylistTitle varchar(255)").execute();
             con.prepareStatement("UPDATE videolist SET Active = 1").execute();
         }
     }
@@ -224,6 +227,7 @@ public class Main {
                 case "playlists":
                     con.prepareStatement("CREATE TABLE playlists(" +
                             "PlaylistId int NOT NULL AUTO_INCREMENT," +
+                            "PlaylistTitle varchar(255)," +
                             "Playlist varchar(255)," +
                             "Views int," +
                             "PRIMARY KEY (PlaylistId))").execute();

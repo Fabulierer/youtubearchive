@@ -153,7 +153,7 @@ public class Server {
                         try {
                             switch (args[1]) {
                                 case "v": {
-                                    AddVideo.addVideo(args[2],  con);
+                                    AddVideo.addVideo(args[2],  con, false);
                                     break;
                                 }
                                 case "p": {

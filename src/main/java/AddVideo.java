@@ -2,21 +2,25 @@ import com.github.kiulian.downloader.YoutubeDownloader;
 import com.github.kiulian.downloader.YoutubeException;
 import com.github.kiulian.downloader.model.VideoDetails;
 import com.github.kiulian.downloader.model.YoutubeVideo;
-import com.github.kiulian.downloader.model.playlist.PlaylistVideoDetails;
+import com.github.kiulian.downloader.model.playlist.YoutubePlaylist;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.List;
 
 public class AddVideo {
 
     public static void addPlaylist(String id, int minViews, Connection con) throws YoutubeException, SQLException {
         System.out.println("Adding to playlist table");
-        PreparedStatement ps = con.prepareStatement("INSERT INTO playlists VALUES (NULL, (?), (?))");
-        ps.setString(1, id);
-        ps.setInt(2, minViews);
+        //TODO check if playlist is already in table
+        YoutubeDownloader ytdl = new YoutubeDownloader();
+        YoutubePlaylist pl = ytdl.getPlaylist(id);
+        String title = pl.details().title();
+        PreparedStatement ps = con.prepareStatement("INSERT INTO playlists VALUES (NULL, (?), (?), (?))");
+        ps.setString(1, title);
+        ps.setString(2, id);
+        ps.setInt(3, minViews);
         ps.execute();
     }
 
@@ -24,14 +28,14 @@ public class AddVideo {
         addPlaylist(new YoutubeDownloader().getChannelUploads(id).details().playlistId(), minViews, con);
     }
 
-    public static void addVideo(String id, Connection con) throws SQLException, VideoCodecNotFoundException, YoutubeException {
-        if (!con.prepareStatement("SELECT VideoID FROM videolist WHERE VideoID = '" + id + "'").executeQuery().next()) {
+    public static void addVideo(String id, Connection con, boolean overwrite) throws SQLException, VideoCodecNotFoundException, YoutubeException {
+        if (!con.prepareStatement("SELECT VideoID FROM videolist WHERE VideoID = '" + id + "'").executeQuery().next() || overwrite) {
             YoutubeDownloader downloader = new YoutubeDownloader();
             YoutubeVideo v = downloader.getVideo(id);
             VideoDetails details = v.details();
             System.out.println("Adding the video: " + details.title());
             Integer[] formats = BestFormat.getFormats(v);
-            PreparedStatement ps = con.prepareStatement("INSERT INTO videolist " +
+            PreparedStatement ps = con.prepareStatement("REPLACE INTO videolist " +
                     "VALUES((?)," +
                     "(?)," +
                     "(?)," +

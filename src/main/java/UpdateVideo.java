@@ -52,7 +52,7 @@ public class UpdateVideo {
                         try {
                             String videoId = pl.get(j).videoId();
                             if (downloader.getVideo(videoId).details().viewCount() > rs.getInt(2)) {
-                                AddVideo.addVideo(videoId, con);
+                                AddVideo.addVideo(videoId, con, false);
                             } else {
                                 Menu.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
                             }
@@ -66,7 +66,7 @@ public class UpdateVideo {
                             try {
                                 String videoId = pl.get(j).videoId();
                                 if (downloader.getVideo(videoId).details().viewCount() > rs.getInt(2)) {
-                                    AddVideo.addVideo(videoId, con);
+                                    AddVideo.addVideo(videoId, con, false);
                                 } else {
                                     Menu.println("Video was skipped because it does not have the minimum amount of views required to be archived.");
                                 }
